@@ -1,0 +1,45 @@
+2017/07/20 14:17:01,124 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:21:08,099 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=717698316110-i03blan8cph68e10hgl7u01fcj31brt3.apps.googleusercontent.com
+2017/07/20 14:23:38,488 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=717698316110-i03blan8cph68e10hgl7u01fcj31brt3.apps.googleusercontent.com
+2017/07/20 14:24:42,894 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=717698316110-i03blan8cph68e10hgl7u01fcj31brt3.apps.googleusercontent.com
+2017/07/20 14:33:28,340 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=717698316110-i03blan8cph68e10hgl7u01fcj31brt3.apps.googleusercontent.com
+2017/07/20 14:34:47,990 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=717698316110-i03blan8cph68e10hgl7u01fcj31brt3.apps.googleusercontent.com
+2017/07/20 14:35:20,495 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:36:30,576 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:49:13,615 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:50:05,444 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:51:26,161 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:51:38,882 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:52:07,940 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 14:59:52,334 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=miyake%40kke.co.jp
+2017/07/20 15:05:13,550 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?key=miyake%40kke.co.jp
+2017/07/20 15:05:49,687 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:06:27,353 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:13:29,371 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:14:06,715 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:181) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/miyake@kke.co.jp/messages/send?uploadType=media
+2017/07/20 15:16:09,146 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:178) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/miyake@kke.co.jp/messages/send?uploadType=media
+2017/07/20 15:16:26,512 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:178) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:16:40,053 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:178) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:16:49,156 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:178) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:17:30,432 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:179) doApiRequest:POST:https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media
+2017/07/20 15:43:38,046 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:45:15,619 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:45:50,184 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:47:26,634 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:47:27,802 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line:{
+2017/07/20 15:47:27,803 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line: "id": "15d5ec04d6d0d780",
+2017/07/20 15:47:27,803 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line: "threadId": "15d5ec04d6d0d780",
+2017/07/20 15:47:27,803 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line: "labelIds": [
+2017/07/20 15:47:27,804 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line:  "SENT"
+2017/07/20 15:47:27,804 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line: ]
+2017/07/20 15:47:27,804 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:211) line:}
+2017/07/20 15:56:28,331 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:56:39,116 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:57:19,721 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:186) doApiRequest:POST:https://www.googleapis.com/gmail/v1/users/me/messages/send
+2017/07/20 15:57:21,131 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line:{
+2017/07/20 15:57:21,132 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line: "id": "15d5ec95b5ad2f6d",
+2017/07/20 15:57:21,132 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line: "threadId": "15d5ec95b5ad2f6d",
+2017/07/20 15:57:21,132 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line: "labelIds": [
+2017/07/20 15:57:21,133 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line:  "SENT"
+2017/07/20 15:57:21,133 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line: ]
+2017/07/20 15:57:21,133 [INFO ] jp.co.kke.Lockstatedemo.mng.MngGoogleApi.doApiRequest(MngGoogleApi.java:207) line:}

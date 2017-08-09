@@ -1,0 +1,57 @@
+html,body{
+	height: 100%;
+}
+div#wrapper{
+	width:900px;
+	height:auto;
+	margin:0 auto;
+	border:1px solid #222222;
+}
+div#header{
+	width:auto;
+	padding:20px 10px;
+	background-color:#0F218B;
+	color:#ffffff;
+}
+div#footer{
+	clear:both;
+	width:auto;
+	background-color:#0F218B;
+	text-align:center;
+}
+div#footer address{
+	font-style: normal;
+	font-size:0.8em;
+	line-height:2;
+	color:#ffffff;
+}
+div#ApplianceInfo{
+	float:left;
+	width:580x;
+	padding:5px;
+	background-color:#FFFFFF;
+}
+div#AdjustmentInfoList{
+	float:right;
+	width:279px;
+	height:100%;
+	min-height:100%;
+	padding:5px;
+	background-color:#FFFFFF;
+	border-left:1px solid #222222;
+}
+div#AdjustmentInfo{
+	width:100%;
+	font-size:0.8em;
+	background-color:#FFFFFF;
+	border-top:1px solid #222222;
+}
+div#ErrorInfo{
+	width:auto%;
+	padding:15px;
+	background-color:#FFFFFF;
+}
+div#ErrorInfo blockquote{
+	font-style:normal;
+	font-size:0.6em;
+}

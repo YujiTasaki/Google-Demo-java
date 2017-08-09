@@ -1,0 +1,91 @@
+html,body{
+	height: 100%;
+}
+div#wrapper{
+	width:900px;
+	height:auto;
+	margin:0 auto;
+	border:1px solid #222222;
+}
+div#header{
+	width:auto;
+	padding:20px 10px;
+	background-color:#0F218B;
+	color:#ffffff;
+}
+div#footer{
+	clear:both;
+	width:auto;
+	background-color:#0F218B;
+	text-align:center;
+}
+div#footer address{
+	font-style: normal;
+	font-size:0.8em;
+	line-height:2;
+	color:#ffffff;
+}
+div#ApplianceInfo{
+	float:left;
+	width:580px;
+	height:100%;
+	min-height:100%;
+	padding:5px;
+	background-color:#FFFFFF;
+}
+div#AdjustmentInfo{
+	float:right;
+	width:279px;
+	height:100%;
+	min-height:100%;
+	padding:5px;
+	background-color:#FFFFFF;
+	border-left:1px solid #222222;
+}
+div#AdjustmentItemList{
+	width:250px;
+	height:100%;
+	min-height:100%;
+	font-size:0.8em;
+	background-color:#FFFFFF;
+}
+div#AdjustmentItem{
+	width:100%;
+	background-color:#FFFFFF;
+	border-top:1px solid #222222;
+}
+div#ErrorInfo{
+	width:auto;
+	padding:15px;
+	background-color:#FFFFFF;
+}
+div#ErrorInfo blockquote{
+	font-style:normal;
+	font-size:0.6em;
+}
+ul.narrow{
+	margin: 10px 10px 10px 10px;
+}
+div.narrow{
+	margin: 10px 10px 10px 10px;
+}
+div#DR_SW{
+	width:80px;
+	height:30px;
+	text-align:center;
+	vertical-align: middle;
+}
+div#main{
+	margin: 10px 20px 10px 20px;
+	text-align:center;
+	vertical-align: middle;
+}
+div#chart1{
+	margin: 0px 20px 0px 20px;
+	text-align:center;
+	vertical-align: middle;
+}
+input#modepriority-OFF { width: 60px; }
+input#modenominalpower-OFF { width: 60px; }
+input#modepriority-ON { width: 60px; }
+input#modenominalpower-ON { width: 60px; }
