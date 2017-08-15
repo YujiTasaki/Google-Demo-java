@@ -65,8 +65,8 @@ public class ServletUtil {
 	 * @throws ServletException
 	 */
 	public static void returnJsp(HttpServletRequest request, HttpServletResponse response, String jspPath) throws ServletException, IOException{
-		RequestDispatcher ｄispatchers = request.getRequestDispatcher(jspPath);
-		ｄispatchers.forward(request, response);
+		RequestDispatcher dispatchers = request.getRequestDispatcher(jspPath);
+		dispatchers.forward(request, response);
 	}
 
 	/**
