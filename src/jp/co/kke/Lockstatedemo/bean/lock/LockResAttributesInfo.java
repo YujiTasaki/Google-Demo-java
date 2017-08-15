@@ -64,7 +64,7 @@ public class LockResAttributesInfo {
 	private String serial_number;
 
 	private Integer heartbeat_interval;
-	private Boolean wake_wifi;
+	private String wake_wifi;
 
 	private Boolean muted;
 	private Boolean auto_lock;
@@ -319,10 +319,10 @@ public class LockResAttributesInfo {
 	public void setHeartbeat_interval(Integer heartbeat_interval) {
 		this.heartbeat_interval = heartbeat_interval;
 	}
-	public Boolean getWake_wifi() {
+	public String getWake_wifi() {
 		return wake_wifi;
 	}
-	public void setWake_wifi(Boolean wake_wifi) {
+	public void setWake_wifi(String wake_wifi) {
 		this.wake_wifi = wake_wifi;
 	}
 	public Boolean getMuted() {

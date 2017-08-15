@@ -5,10 +5,14 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jp.co.kke.Lockstatedemo.bean.api.ResponseInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResAttributesInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResDataInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
 import jp.co.kke.Lockstatedemo.mng.MsgException;
 import jp.co.kke.Lockstatedemo.mng.svlt.AbstractMngMessage;
 import jp.co.kke.Lockstatedemo.util.ServletUtil;
@@ -19,23 +23,52 @@ public class SetDevice extends AbstractMngMessage {
 	public void doJob(Map<String, Object> hArg, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		pharseArg(hArg);
-		returnOk(request, response);
+		LockResAttributesInfo lockResAttributesInfo = getDevice(id);
+		if(lockResAttributesInfo == null) {
+			throw new MsgException(String.format("デバイスが存在しません:%s", id));
+		}
+		returnOk(request, response ,"発見!:" + lockResAttributesInfo.toString());
 	}
 
 	@Override
-	public void returnError(HttpServletRequest request, HttpServletResponse response, Exception ex) throws Exception {
-		ResponseInfo responseInfo = new ResponseInfo();
-		responseInfo.setState(ResponseInfo.S_State_NG);
-		responseInfo.setMsg(ex.getMessage());
-		ServletUtil.returnJson(response, responseInfo, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	public void returnError(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception{
+		request.setAttribute(ServletUtil.S_REQ_ATT_KEY_ERROR, e.getMessage());
+		ServletUtil.returnJsp(request, response, "/jsp/system_error.jsp");
 	}
 
-	public void returnOk(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		ResponseInfo responseInfo = new ResponseInfo();
-		responseInfo.setState(ResponseInfo.S_State_OK);
-		responseInfo.setMsg(id);
-		ServletUtil.returnJson(response, responseInfo);
+	public void returnOk(HttpServletRequest request, HttpServletResponse response, String msg) throws IOException, ServletException{
+		request.setAttribute(ServletUtil.S_REQ_ATT_KEY_INFO,  "成功:" + msg);
+		ServletUtil.returnJsp(request, response, "/jsp/system_ok.jsp");
 	}
+
+
+
+	/**
+	 *
+	 * @param hArg
+	 * @throws Exception
+	 */
+	private LockResAttributesInfo getDevice(String serial_number) throws Exception{
+		LockResAttributesInfo res = null;
+		LockResInfoList lockResInfoList = this.getServlet().getMngLockApi().getAllDevices();
+		if(lockResInfoList == null) {
+			return null;
+		}
+		for(LockResDataInfo lockResDataInfo: lockResInfoList.getData()) {
+			LockResAttributesInfo tmpLockResAttributesInfo = lockResDataInfo.getAttributes();
+			String tmpSerial_number = tmpLockResAttributesInfo.getSerial_number();
+			if(serial_number.equals(tmpSerial_number)) {
+				res = tmpLockResAttributesInfo;
+				break;
+			}
+		}
+		return res;
+	}
+
+
+
+
+
 	/**
 	 *
 	 * @param hArg
