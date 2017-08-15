@@ -7,7 +7,12 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventsListInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResOAuthInfo;
+import jp.co.kke.Lockstatedemo.util.GoogleApiUtil;
 import jp.co.kke.Lockstatedemo.util.LockApiUtil;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
 
@@ -54,6 +59,16 @@ public class MngLockApi {
 			this.refreshToken = null;
 			this.updateToken = 0;
 		}
+	}
+
+
+	public LockResInfoList getAllDevices() throws Exception{
+		LockResInfoList res = null;
+		if(this.accessToken == null){
+			throw new MsgException("未認証");
+		}
+		res = LockApiUtil.getAllDevices(this.accessToken);
+		return res;
 	}
 
 	private class OAuthTokeCheckTask extends TimerTask {

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
 <script type="text/javascript" src="./js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="./js/jquery.mobile-1.4.5.min.js"></script>
-<title>LockStateデモトップページ</title>
+<title>LockStateSetDevice</title>
 </head>
 <body>
 <!-- WRAPPER -->
@@ -21,26 +21,10 @@
 <!-- /HEADER -->
 <div id="main">
 	<div data-role="ui-content">
-		<ul id="dr_info" data-role="listview" data-inset="true" class="narrow">
-			<li data-role="list-divider">
-				<span>認証設定</span>
-			</li>
-			<li>
-				<a href="./jsp/LockAuthorize.jsp" target="_blank">Get Lock Authorize Code</a>
-			</li>
-			<li>
-				<a href="./jsp/GoogleAuthorize.jsp" target="_blank">Get Google Authorize Code</a>
-			</li>
-			<li>
-				<a href="./sendmail.html" target="_blank">TestSendMail</a>
-			</li>
-			<li>
-				<a href="./setdevice.html" target="_blank">SetDevice</a>
-			</li>
-			<li>
-				<a href="./api/GetCalendarList" target="_blank">GetCalendarList</a>
-			</li>
-		</ul>
+<form action="./api/SetDevice" method="post">
+ <div>デバイスシリアルID：<input type="text" name="id" value="AC000W000227775"></div>
+ <input type="submit" value="送信">
+</form>
 	</div>
 </div>
 <!-- FOOTER  -->

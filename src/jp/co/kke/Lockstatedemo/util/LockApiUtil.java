@@ -197,7 +197,7 @@ public class LockApiUtil {
 	        connection.setRequestProperty( "Host" , "api.lockstate.com");
 	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
 	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
-	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
 	        String line = null;
 	        while((line = reader.readLine()) != null){
 	        	res.append(line);
@@ -263,7 +263,7 @@ public class LockApiUtil {
 	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
 	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
 	        connection.connect();
-	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
 	        String line = null;
 	        while((line = reader.readLine()) != null){
 	        	res.append(line);
