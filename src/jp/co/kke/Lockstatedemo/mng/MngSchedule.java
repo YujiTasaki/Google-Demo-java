@@ -15,6 +15,8 @@ import jp.co.kke.Lockstatedemo.MainServlet;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventAttendeeInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventsListInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
 /**
  * スケジュールチェック定期実行管理クラス
@@ -97,7 +99,38 @@ public class MngSchedule {
 		logger.info(eventMap);
 
 		//API実行
-		mngLockApi.createUsers(null);
+		for(String key: eventMap.keySet())
+		{
+			List<List<String>> value = eventMap.get(key);
+			List<String> datas = value.get(0);
+			List<String> attendees = value.get(1);
+			String status = datas.get(0);
+			String startAt = datas.get(1);
+			String endAt = datas.get(2);
+
+			for(int i=0; i<attendees.size(); i++) {
+
+				String email = attendees.get(i);
+				String name = email;
+				String pinCode = "";
+				for(int r=0; r<8; r++) {
+					Random rnd = new Random();
+					pinCode = pinCode + String.valueOf(rnd.nextInt(10));
+				}
+
+				//アクセスゲストの作成
+				LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
+				info.setType("access_guest");
+				info.getAttributes().put("name", name);
+				info.getAttributes().put("email", email);
+				info.getAttributes().put("pin", pinCode);
+				info.getAttributes().put("starts_at", startAt);
+				info.getAttributes().put("ends_at", endAt);
+				LockResAccessPersonsInfo resUser = mngLockApi.createUsers(info);
+				String userId = resUser.getData().getId();
+				logger.info(userId);
+			}
+		}
 
 		logger.info("doCheck:end");
 	}
@@ -137,15 +170,9 @@ public class MngSchedule {
 			}
 			endAt = endAt.substring(0, 19);
 
-			String pinCode = "";
-			for(int r=0; r<8; r++) {
-				Random rnd = new Random();
-				pinCode = pinCode + String.valueOf(rnd.nextInt(10));
-			}
 			infoList.add(status);
 			infoList.add(startAt);
 			infoList.add(endAt);
-			infoList.add(pinCode);
 
 			//参加者メールリスト
 			List<String> attendEmailList = new ArrayList<String>();
@@ -154,10 +181,14 @@ public class MngSchedule {
 			List<GoogleResCalendarEventAttendeeInfo> attendees = items.getAttendees();
 			if(attendees != null)
 			{
-				//attendeesの1番目は登録者、最後はアカウントユーザーのため
-				for(int j=1; j<attendees.size()-1; j++){
+
+				for(int j=0; j<attendees.size(); j++){
 					String attendEmail = attendees.get(j).getEmail();
-					attendEmailList.add(attendEmail);
+					//attendeesのうち登録者、アカウントユーザーを外す
+					if((!attendEmail.equals(email)) && (!attendEmail.equals(SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID"))))
+					{
+						attendEmailList.add(attendEmail);
+					}
 				}
 			}
 
