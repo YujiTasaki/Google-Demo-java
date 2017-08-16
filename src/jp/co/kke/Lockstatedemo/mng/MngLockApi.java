@@ -164,7 +164,7 @@ public class MngLockApi {
 	 */
 	public LockResInfoList getAllDevices() throws Exception{
 		LockResInfoList res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();
@@ -188,7 +188,7 @@ public class MngLockApi {
 	 */
 	public LockResInfo doLockDevice(String id, boolean isLock) throws Exception{
 		LockResInfo res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();
@@ -210,7 +210,7 @@ public class MngLockApi {
 	 */
 	public LockResDataInfo getLockResDataInfo(String serial_number) throws Exception{
 		LockResDataInfo res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();

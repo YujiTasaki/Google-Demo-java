@@ -140,7 +140,7 @@ public class MngGoogleApi {
 	 */
 	private String refreshAccessToken(){
 		try {
-			if(this.accessToken == null){
+			if(isOkAccessToken() == false){
 				throw new MsgException("未認証");
 			}
 			lock.lock();
@@ -172,7 +172,7 @@ public class MngGoogleApi {
 	 */
 	public GoogleResCreateChannelInfo createCalendarChannel(String uuid, String calendarId) throws Exception{
 		GoogleResCreateChannelInfo res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();
@@ -195,7 +195,7 @@ public class MngGoogleApi {
 	 */
 	public GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId) throws Exception{
 		GoogleResCalendarEventsListInfo res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();
@@ -218,7 +218,7 @@ public class MngGoogleApi {
 	 */
 	public GoogleResGmailSendInfo sendMail(MimeMessage mimeMessage) throws Exception{
 		GoogleResGmailSendInfo res = null;
-		if(this.accessToken == null){
+		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
 		}
 		lock.lock();
