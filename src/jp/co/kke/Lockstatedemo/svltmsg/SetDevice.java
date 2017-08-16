@@ -9,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jp.co.kke.Lockstatedemo.bean.api.ResponseInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResAttributesInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResDataInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
