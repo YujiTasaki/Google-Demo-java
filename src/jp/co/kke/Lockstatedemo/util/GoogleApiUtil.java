@@ -29,7 +29,10 @@ import jp.co.kke.Lockstatedemo.bean.google.GoogleResCreateChannelInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResGmailSendInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResOAuthInfo;
 import jp.co.kke.Lockstatedemo.mng.MsgException;
-
+/**
+ * GoogleAPIユーティリティークラス
+ * @author KKE
+ */
 public class GoogleApiUtil {
 	/**
 	 * ロガー
@@ -337,7 +340,7 @@ public class GoogleApiUtil {
 	        }else{
 	        	stream = connection.getInputStream();
 	        }
-	        reader  = new BufferedReader(new InputStreamReader(stream));
+	        reader  = new BufferedReader(new InputStreamReader(stream, S_CHARSET));
 	        String line = null;
 	        while((line = reader.readLine()) != null){
 	        	res.append(line).append("\n");
@@ -408,7 +411,7 @@ public class GoogleApiUtil {
 	        }else{
 	        	stream = connection.getInputStream();
 	        }
-	        reader  = new BufferedReader(new InputStreamReader(stream));
+	        reader  = new BufferedReader(new InputStreamReader(stream, S_CHARSET));
 	        String line = null;
 	        while((line = reader.readLine()) != null){
 	        	res.append(line).append("\n");

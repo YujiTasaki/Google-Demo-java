@@ -23,23 +23,71 @@ import jp.co.kke.Lockstatedemo.util.SysParamUtil;
  * @author KKE
  */
 public class MngGoogleApi {
+	/**
+	 * ロガー
+	 */
 	private static Logger logger = Logger.getLogger(MngGoogleApi.class);
-
+	/**
+	 * アクセストークン
+	 */
 	private String accessToken = null;
+	/**
+	 * リフレッシュトークン
+	 */
 	private String refreshToken = null;
+	/**
+	 * トークン更新日時(ミリ秒)
+	 */
 	private long updateToken = 0;
 
+	/**
+	 * Google アクセストークン更新間隔(ミリ秒)
+	 */
 	private final long limitTokenMsec = SysParamUtil.getResourceLong("GOOGLE_API_ACCESS_TOKEN_LIMIT_SEC") * 1000;
+	/**
+	 * Google トークンチェック処理間隔(ミリ秒)
+	 */
 	private final long checkTokenMsec = SysParamUtil.getResourceLong("GOOGLE_API_ACCESS_TOKEN_CHECK_SEC") * 1000;
 
+	/**
+	 * アクセストークンチェックタイマー
+	 */
 	private Timer checkTokenTimer = null;
 
-    final Lock lock = new ReentrantLock();
-    final Condition condition = lock.newCondition();
+	/**
+	 * アクセストークン用チェッククラス
+	 */
+	private final Lock lock = new ReentrantLock();
+
+    /**
+     * アクセストークン用コンディションクラス
+     */
+	private final Condition condition = lock.newCondition();
+    /**
+     * リフレッシュフラグ
+     */
     boolean isRefresh = false;
 
 	/**
-	 * アクセストーク取得済?
+	 * アクセストークン更新タイマタスククラス
+	 * @author KKE
+	 *
+	 */
+	private class OAuthTokeCheckTask extends TimerTask {
+		@Override
+		public void run() {
+			if((accessToken == null)|(refreshToken == null)){
+				return;
+			}
+			long curMsec = Calendar.getInstance().getTimeInMillis();
+			if(curMsec < (updateToken + limitTokenMsec)){
+				return;
+			}
+			refreshAccessToken();
+		}
+	}
+	/**
+	 * アクセストーク取得済か否か
 	 * @return
 	 */
 	public boolean isOkAccessToken() {
@@ -49,24 +97,48 @@ public class MngGoogleApi {
 		}
 		return res;
 	}
+	/**
+	 * アクセストークン要求
+	 * @param authorizationCode
+	 * @return
+	 * @throws IOException
+	 * @throws MsgException
+	 */
 	public String requestAccessToken(String authorizationCode) throws IOException, MsgException{
-		if(this.checkTokenTimer != null){
-			this.checkTokenTimer.cancel();
+		try {
+			lock.lock();
+			isRefresh = true;
+			if(this.checkTokenTimer != null){
+				this.checkTokenTimer.cancel();
+			}
+			this.checkTokenTimer = new Timer();
+			this.accessToken = null;
+			this.refreshToken = null;
+			this.updateToken = 0;
+			GoogleResOAuthInfo oAuthInfo = GoogleApiUtil.requestOAuthToken(authorizationCode);
+			this.accessToken = oAuthInfo.getAccess_token();
+			this.refreshToken = oAuthInfo.getRefresh_token();
+			this.updateToken = Calendar.getInstance().getTimeInMillis();
+			logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
+			this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, checkTokenMsec);
+			condition.signalAll();// Signalを送ることで対応するConditionでawaitしていた処理が再開する。
+		} catch (Exception e) {
+			logger.error("can't request AccessToken", e);
+			this.accessToken = null;
+			this.refreshToken = null;
+			this.updateToken = 0;
+			throw e;
+		} finally{
+			isRefresh = false;
+			lock.unlock();
 		}
-		this.checkTokenTimer = new Timer();
-		this.accessToken = null;
-		this.refreshToken = null;
-		this.updateToken = 0;
-		GoogleResOAuthInfo oAuthInfo = GoogleApiUtil.requestOAuthToken(authorizationCode);
-		this.accessToken = oAuthInfo.getAccess_token();
-		this.refreshToken = oAuthInfo.getRefresh_token();
-		this.updateToken = Calendar.getInstance().getTimeInMillis();
-		logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
-		this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, checkTokenMsec);
 		return this.accessToken;
 	}
-
-	private void refreshAccessToken(){
+	/**
+	 * アクセストークン更新
+	 * @return
+	 */
+	private String refreshAccessToken(){
 		try {
 			if(this.accessToken == null){
 				throw new MsgException("未認証");
@@ -88,22 +160,16 @@ public class MngGoogleApi {
 			isRefresh = false;
 			lock.unlock();
 		}
+		return this.accessToken;
 	}
 
-	private class OAuthTokeCheckTask extends TimerTask {
-		@Override
-		public void run() {
-			if((accessToken == null)|(refreshToken == null)){
-				return;
-			}
-			long curMsec = Calendar.getInstance().getTimeInMillis();
-			if(curMsec < (updateToken + limitTokenMsec)){
-				return;
-			}
-			refreshAccessToken();
-		}
-	}
-
+	/**
+	 * カレンダチャンネルの生成
+	 * @param uuid
+	 * @param calendarId
+	 * @return
+	 * @throws Exception
+	 */
 	public GoogleResCreateChannelInfo createCalendarChannel(String uuid, String calendarId) throws Exception{
 		GoogleResCreateChannelInfo res = null;
 		if(this.accessToken == null){
@@ -121,6 +187,12 @@ public class MngGoogleApi {
 		return res;
 	}
 
+	/**
+	 * カレンダ更新イベントの取得
+	 * @param calendarId
+	 * @return
+	 * @throws Exception
+	 */
 	public GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId) throws Exception{
 		GoogleResCalendarEventsListInfo res = null;
 		if(this.accessToken == null){
@@ -138,6 +210,12 @@ public class MngGoogleApi {
 		return res;
 	}
 
+	/**
+	 * メール送付
+	 * @param mimeMessage
+	 * @return
+	 * @throws Exception
+	 */
 	public GoogleResGmailSendInfo sendMail(MimeMessage mimeMessage) throws Exception{
 		GoogleResGmailSendInfo res = null;
 		if(this.accessToken == null){

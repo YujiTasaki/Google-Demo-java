@@ -2,7 +2,9 @@
 package jp.co.kke.Lockstatedemo.util;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -22,7 +24,10 @@ import jp.co.kke.Lockstatedemo.bean.lock.LockResInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResOAuthInfo;
 import jp.co.kke.Lockstatedemo.mng.MsgException;
-
+/**
+ * LockstatesAPIユーティリティークラス
+ * @author KKE
+ */
 public class LockApiUtil {
 
 	//b60a015f448b35b8e990fb8d875468e952b0a0679fbff1cd42452ec8ead23a26
@@ -55,9 +60,58 @@ public class LockApiUtil {
 	 */
 	private static final String S_REDIRECT_URI    = SysParamUtil.getResourceString("LOCK_OAUTH_REDIRECT_URI");
 
+	/**
+	 * OAuth2トークン取得用URL
+	 */
+	private static final String S_API_GET_OAUTH_TOKEN_URI    = S_OAUTH_ENDPOINT + "/oauth/token";
+
+	/**
+	 * 全デバイス情報取得用URL
+	 */
+	private static final String S_API_ALL_DEVICES_URI    = S_API_ENDPOINT + "/devices";
+
+
+	/**
+	 * 通信用文字コード
+	 */
     private final static String S_CHARSET = "UTF-8";
+	/**
+	 * Authorizationコード取得用URL
+	 * リダイレクトで使用
+	 * @return
+	 */
+	public static String getAuthorizationCodeUrl() {
+		Map<String, String> paramMap = getAuthorizationCodeParamMap();
+		String param = getParam(paramMap);
+		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
+	}
 
+	/**
+	 * デバイスの鍵の開閉用URL
+	 * @param id
+	 * @param isLock
+	 * @return
+	 */
+	private static String getLockDeviceUrl(String id, boolean isLock){
+		StringBuilder res = new StringBuilder();
+		res.append(S_API_ENDPOINT);
+//		res.append("/devices/");
+		res.append("/locks/");
+		res.append(id);
+		res.append('/');
+		if(isLock){
+			res.append("lock");
+		}else{
+			res.append("unlock");
+		}
+		return res.toString();
+	}
 
+    /**
+     * アクセストークン更新用パラメータ生成
+     * @param refresh_token
+     * @return
+     */
 	private static Map<String, String> getRefreshTokenParamMap(String refresh_token){
 		Map<String, String> res = new HashMap<String, String>();
 		res.put("client_id", S_CLIENT_ID);
@@ -67,6 +121,11 @@ public class LockApiUtil {
 		return res;
 	}
 
+	/**
+	 * OAuth認証用パラメータ生成
+	 * @param authorizationCode
+	 * @return
+	 */
 	private static Map<String, String> getOAuthTokenParamMap(String authorizationCode){
 		Map<String, String> res = new HashMap<String, String>();
 		res.put("code", authorizationCode);
@@ -77,6 +136,10 @@ public class LockApiUtil {
 		return res;
 	}
 
+	/**
+	 * AuthorizationCode生成用パラメータ生成
+	 * @return
+	 */
 	private static Map<String, String> getAuthorizationCodeParamMap(){
 		Map<String, String> res = new HashMap<String, String>();
 		res.put("client_id", S_CLIENT_ID);
@@ -85,6 +148,11 @@ public class LockApiUtil {
 		return res;
 	}
 
+	/**
+	 * パラメータをGet用文字列に変換
+	 * @param paramMap
+	 * @return
+	 */
 	private static String getParam(Map<String, String> paramMap){
 		StringBuilder res = new StringBuilder();
 		boolean isFast = true;
@@ -106,131 +174,115 @@ public class LockApiUtil {
 		return res.toString();
 	}
 
-	private static String initOAuthTokenJson(String authorizationCode) throws IOException, MsgException{
+	/**
+	 * アクセストークン取得(Json形式)
+	 * @param authorizationCode
+	 * @return　返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	private static String requestOAuthTokenJson(String authorizationCode) throws IOException, MsgException{
 		Map<String, String> paramMap = getOAuthTokenParamMap(authorizationCode);
 		String param = getParam(paramMap);
-		String url = getOAuthTokenUrl();
-		return doOAuthRequest(url, param);
+		return doOAuthRequest(S_API_GET_OAUTH_TOKEN_URI, param);
 	}
-
+	/**
+	 * アクセストークンのリフレッシュ(Json形式)
+	 * @param refresh_token
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
 	private static String refreshOAuthTokenJson(String refresh_token) throws IOException, MsgException{
 		Map<String, String> paramMap = getRefreshTokenParamMap(refresh_token);
 		String param = getParam(paramMap);
-		String url = getOAuthTokenUrl();
-		return doOAuthRequest(url, param);
+		return doOAuthRequest(S_API_GET_OAUTH_TOKEN_URI, param);
 	}
 
-	private static String getAllDevicesJson(String access_token) throws IOException{
-		String url = getAllDevicesUrl();
-		return doApiGetRequest(url, access_token);
+	/**
+	 * 全デバイス情報の取得(Json形式)
+	 * @param access_token
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	private static String getAllDevicesJson(String access_token) throws IOException, MsgException{
+		return doApiRequest(S_API_ALL_DEVICES_URI, "GET", access_token, null);
 	}
-
-	private static String doLockDeviceJson(String access_token, String id, boolean isLock) throws IOException{
+	/**
+	 * デバイスの鍵の開閉(Json形式)
+	 * @param access_token
+	 * @param id
+	 * @param isLock　鍵の開閉（true:閉める false:開ける)
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	private static String doLockDeviceJson(String access_token, String id, boolean isLock) throws IOException, MsgException{
 		String url = getLockDeviceUrl(id, isLock);
-		return doApiPutRequest(url, access_token);
+		//return doApiPutRequest(url, access_token);
+		return doApiRequest(url, "PUT", access_token, null);
 	}
-
-	public static LockResOAuthInfo initOAuthToken(String authorizationCode) throws IOException, MsgException{
+	/**
+	 * アクセストークン取得(返信オブジェクト形式)
+	 * @param authorizationCode
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static LockResOAuthInfo requestOAuthToken(String authorizationCode) throws IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
-		String json = initOAuthTokenJson(authorizationCode);
+		String json = requestOAuthTokenJson(authorizationCode);
 		return mapper.readValue(json, LockResOAuthInfo.class);
 	}
-
+	/**
+	 * アクセストークンのリフレッシュ(返信オブジェクト形式)
+	 * @param refresh_token
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
 	public static LockResOAuthInfo refreshOAuthToken(String refresh_token) throws IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
 		String json = refreshOAuthTokenJson(refresh_token);
 		return mapper.readValue(json, LockResOAuthInfo.class);
 	}
-
-	public static LockResInfoList getAllDevices(String access_token) throws IOException{
+	/**
+	 * 全デバイス情報の取得(返信オブジェクト形式)
+	 * @param access_token
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static LockResInfoList getAllDevices(String access_token) throws IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
 		String json = getAllDevicesJson(access_token);
 		return mapper.readValue(json, LockResInfoList.class);
 	}
-
-	public static LockResInfo doLockDevice(String access_token, String id, boolean isLock) throws IOException{
+	/**
+	 * デバイスの鍵の開閉(返信オブジェクト形式)
+	 * @param access_token
+	 * @param id
+	 * @param isLock　鍵の開閉（true:閉める false:開ける)
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static LockResInfo doLockDevice(String access_token, String id, boolean isLock) throws IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
 		String json = doLockDeviceJson(access_token, id, isLock);
 		return mapper.readValue(json, LockResInfo.class);
 	}
 
-
-	private static String getOAuthTokenUrl(){
-		return S_OAUTH_ENDPOINT + "/oauth/token";
-	}
-
-	private static String getAllDevicesUrl(){
-		return S_API_ENDPOINT + "/devices";
-	}
-
-	public static String getAuthorizationCodeUrl() {
-		Map<String, String> paramMap = getAuthorizationCodeParamMap();
-		String param = getParam(paramMap);
-		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
-	}
-
-
-	private static String getLockDeviceUrl(String id, boolean isLock){
-		StringBuilder res = new StringBuilder();
-		res.append(S_API_ENDPOINT);
-//		res.append("/devices/");
-		res.append("/locks/");
-		res.append(id);
-		res.append('/');
-		if(isLock){
-			res.append("lock");
-		}else{
-			res.append("unlock");
-		}
-		return res.toString();
-	}
-
-	private static String doApiGetRequest(String url, String access_token) throws IOException{
-		logger.info("doApiGetRequest:"+url);
-		StringBuilder res = new StringBuilder();
-        HttpURLConnection connection = null;
-		BufferedReader reader =null;
-		try{
-	        connection = (HttpURLConnection) new URL(url).openConnection();
-
-	        connection.setRequestMethod("GET");
-	        connection.setRequestProperty( "Host" , "api.lockstate.com");
-	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
-	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
-	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
-	        String line = null;
-	        while((line = reader.readLine()) != null){
-	        	res.append(line);
-	        	logger.info("line:"+line);
-	        }
-		} finally{
-			//コネクションおよびリーダーのクローズ処理
-			if( reader != null){//リーダーが正常に生成されているなら
-				try {
-					reader.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					//内部で例外発生かつコネクションクローズで例外が発生すると
-					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
-					//例外はキャッチしておく
-				}
-			}
-			//コネクションおよびリーダーのクローズ処理
-			if(connection != null){//コネクションが正常に生成されているなら
-				try {
-					connection.disconnect();//クローズ
-				} catch (Exception e) {
-					e.printStackTrace();
-					//内部で例外発生かつコネクションクローズで例外が発生すると
-					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
-					//例外はキャッチしておく
-				}
-			}
-		}
-		return res.toString();
-	}
-
-	public static LockResDataInfo getLockResDataInfo(String access_token, String serial_number) throws IOException{
+	/**
+	 * 指定デバイスの情報取得
+	 * @param access_token
+	 * @param serial_number
+	 * @return  返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static LockResDataInfo getLockResDataInfo(String access_token, String serial_number) throws IOException, MsgException{
 		LockResDataInfo res = null;
 		LockResInfoList resInfo = getAllDevices(access_token);
 		List<LockResDataInfo> datas = resInfo.getData();
@@ -250,52 +302,14 @@ public class LockApiUtil {
 		return res;
 	}
 
-	private static String doApiPutRequest(String url, String access_token) throws IOException{
-		logger.info("doApiPutRequest:"+url);
-		StringBuilder res = new StringBuilder();
-        HttpURLConnection connection = null;
-		BufferedReader reader =null;
-		try{
-	        connection = (HttpURLConnection) new URL(url).openConnection();
-	        connection.setDoOutput(true);
-	        connection.setRequestMethod("PUT");
-	        connection.setRequestProperty( "Host" , "api.lockstate.com");
-	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
-	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
-	        connection.connect();
-	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
-	        String line = null;
-	        while((line = reader.readLine()) != null){
-	        	res.append(line);
-	        	System.out.println("line:"+line);
-	        }
-		} finally{
-			//コネクションおよびリーダーのクローズ処理
-			if( reader != null){//リーダーが正常に生成されているなら
-				try {
-					reader.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					//内部で例外発生かつコネクションクローズで例外が発生すると
-					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
-					//例外はキャッチしておく
-				}
-			}
-			//コネクションおよびリーダーのクローズ処理
-			if(connection != null){//コネクションが正常に生成されているなら
-				try {
-					connection.disconnect();//クローズ
-				} catch (Exception e) {
-					e.printStackTrace();
-					//内部で例外発生かつコネクションクローズで例外が発生すると
-					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
-					//例外はキャッチしておく
-				}
-			}
-		}
-		return res.toString();
-	}
-
+	/**
+	 * アクセストークン取得通信
+	 * @param url
+	 * @param param
+	 * @return
+	 * @throws IOException
+	 * @throws MsgException
+	 */
 	private static String doOAuthRequest(String url, String param) throws IOException, MsgException{
 		logger.info("doOAuthRequest:"+url);
 		StringBuilder res = new StringBuilder();
@@ -347,10 +361,95 @@ public class LockApiUtil {
 		return res.toString();
 	}
 
+	/**
+	 * API通信
+	 * @param url
+	 * @param method
+	 * @param access_token
+	 * @param param
+	 * @return
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	private static String doApiRequest(String url, String method, String access_token, String param) throws IOException, MsgException{
+		logger.info("doApiRequest:"+method +":"+ url);
+		StringBuilder res = new StringBuilder();
+        HttpURLConnection connection = null;
+		BufferedReader reader =null;
+		try{
+	        connection = (HttpURLConnection) new URL(url).openConnection();
+	        connection.setDoOutput(true);
+	        connection.setRequestMethod(method);
+	        connection.setRequestProperty( "Host" , "api.lockstate.jp");
+	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
+	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
+	        if(param != null){//ボディーパラメータ有の場合
+	        	byte[] payload = param.toString().getBytes(S_CHARSET);
+		        connection.getOutputStream().write(payload);
+		        connection.getOutputStream().flush();
+	        }else {//ボディーパラメータ無の場合
+	        	connection.connect();
+	        }
+	        InputStream stream;
+	        int responseCode = connection.getResponseCode();
+	        boolean isErroCode = isErrorCode(responseCode);
+	        if(isErroCode){
+	        	stream = connection.getErrorStream();
+	        }else{
+	        	stream = connection.getInputStream();
+	        }
+	        reader  = new BufferedReader(new InputStreamReader(stream, S_CHARSET));
+	        String line = null;
+	        while((line = reader.readLine()) != null){
+	        	res.append(line).append("\n");
+	        }
+	        if(isErroCode){
+		        logger.error("error doApiRequest:\n" + res);
+		        throw new MsgException("処理に失敗しました");
+	        }
+		} finally{
+			//コネクションおよびリーダーのクローズ処理
+			if( reader != null){//リーダーが正常に生成されているなら
+				try {
+					reader.close();
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+					//内部で例外発生かつコネクションクローズで例外が発生すると
+					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+					//例外はキャッチしておく
+				}
+			}
+			//コネクションおよびリーダーのクローズ処理
+			if(connection != null){//コネクションが正常に生成されているなら
+				try {
+					connection.disconnect();//クローズ
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+					//内部で例外発生かつコネクションクローズで例外が発生すると
+					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+					//例外はキャッチしておく
+				}
+			}
+		}
+		return res.toString();
+	}
 
+	/**
+	 * レスポンスコードがエラーコードか否か
+	 * @param responseCode
+	 * @return
+	 */
+	private static boolean isErrorCode(int responseCode){
+		boolean res = false;
+        if(responseCode != HttpURLConnection.HTTP_OK){
+        //if(responseCode / 100 == 4 || responseCode / 100 == 5){
+        	res = true;
+        }
+        return res;
+	}
 
 	@SuppressWarnings("unused")
-	public static void main(String[] args) throws IOException, InterruptedException{
+	public static void main(String[] args) throws IOException, InterruptedException, MsgException{
 		String authorizationCode = "49f94d1e8738fe8b58427632e575c9e96eff4cd542ef1f90b14745f50460cfed";
 		ObjectMapper mapper = new ObjectMapper();
 		String resp;
@@ -404,5 +503,96 @@ public class LockApiUtil {
 //		System.out.println(oAuthInfo);
 	}
 
+//	private static String doApiPutRequest(String url, String access_token) throws IOException{
+//		logger.info("doApiPutRequest:"+url);
+//		StringBuilder res = new StringBuilder();
+//        HttpURLConnection connection = null;
+//		BufferedReader reader =null;
+//		try{
+//	        connection = (HttpURLConnection) new URL(url).openConnection();
+//	        connection.setDoOutput(true);
+//	        connection.setRequestMethod("PUT");
+//	        connection.setRequestProperty( "Host" , "api.lockstate.com");
+//	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
+//	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
+//	        connection.connect();
+//	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
+//	        String line = null;
+//	        while((line = reader.readLine()) != null){
+//	        	res.append(line);
+//	        	System.out.println("line:"+line);
+//	        }
+//		} finally{
+//			//コネクションおよびリーダーのクローズ処理
+//			if( reader != null){//リーダーが正常に生成されているなら
+//				try {
+//					reader.close();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					//内部で例外発生かつコネクションクローズで例外が発生すると
+//					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+//					//例外はキャッチしておく
+//				}
+//			}
+//			//コネクションおよびリーダーのクローズ処理
+//			if(connection != null){//コネクションが正常に生成されているなら
+//				try {
+//					connection.disconnect();//クローズ
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					//内部で例外発生かつコネクションクローズで例外が発生すると
+//					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+//					//例外はキャッチしておく
+//				}
+//			}
+//		}
+//		return res.toString();
+//	}
+//
+
+//	private static String doApiGetRequest(String url, String access_token) throws IOException{
+//		logger.info("doApiGetRequest:"+url);
+//		StringBuilder res = new StringBuilder();
+//        HttpURLConnection connection = null;
+//		BufferedReader reader =null;
+//		try{
+//	        connection = (HttpURLConnection) new URL(url).openConnection();
+//
+//	        connection.setRequestMethod("GET");
+//	        connection.setRequestProperty( "Host" , "api.lockstate.com");
+//	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
+//	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
+//	        reader  = new BufferedReader(new InputStreamReader(connection.getInputStream(), S_CHARSET));
+//	        String line = null;
+//	        while((line = reader.readLine()) != null){
+//	        	res.append(line);
+//	        	logger.info("line:"+line);
+//	        }
+//		} finally{
+//			//コネクションおよびリーダーのクローズ処理
+//			if( reader != null){//リーダーが正常に生成されているなら
+//				try {
+//					reader.close();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					//内部で例外発生かつコネクションクローズで例外が発生すると
+//					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+//					//例外はキャッチしておく
+//				}
+//			}
+//			//コネクションおよびリーダーのクローズ処理
+//			if(connection != null){//コネクションが正常に生成されているなら
+//				try {
+//					connection.disconnect();//クローズ
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					//内部で例外発生かつコネクションクローズで例外が発生すると
+//					//内部生成時した例外がコネクションクルー時の例外で上書きされてしまう為
+//					//例外はキャッチしておく
+//				}
+//			}
+//		}
+//		return res.toString();
+//	}
 
 }
