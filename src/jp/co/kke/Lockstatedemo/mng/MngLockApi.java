@@ -15,7 +15,10 @@ import jp.co.kke.Lockstatedemo.bean.lock.LockResOAuthInfo;
 import jp.co.kke.Lockstatedemo.util.GoogleApiUtil;
 import jp.co.kke.Lockstatedemo.util.LockApiUtil;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
-
+/**
+ * LockstatesAPI管理クラス
+ * @author KKE
+ */
 public class MngLockApi {
 
 	private static Logger logger = Logger.getLogger(MngLockApi.class);
@@ -28,6 +31,18 @@ public class MngLockApi {
 	private final long checkTokenMsec = SysParamUtil.getResourceLong("LOCK_API_ACCESS_TOKEN_CHECK_SEC") * 1000;
 
 	private Timer checkTokenTimer = null;
+
+	/**
+	 * アクセストーク取得済?
+	 * @return
+	 */
+	public boolean isOkAccessToken() {
+		boolean res = false;
+		if(accessToken != null) {
+			res = false;
+		}
+		return res;
+	}
 
 	public String requestAccessToken(String authorizationCode) throws IOException, MsgException{
 		if(this.checkTokenTimer != null){

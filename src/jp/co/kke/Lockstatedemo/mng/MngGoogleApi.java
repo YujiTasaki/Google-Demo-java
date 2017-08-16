@@ -18,7 +18,10 @@ import jp.co.kke.Lockstatedemo.bean.google.GoogleResGmailSendInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResOAuthInfo;
 import jp.co.kke.Lockstatedemo.util.GoogleApiUtil;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
-
+/**
+ * GoogleAPI管理クラス
+ * @author KKE
+ */
 public class MngGoogleApi {
 	private static Logger logger = Logger.getLogger(MngGoogleApi.class);
 
@@ -35,6 +38,17 @@ public class MngGoogleApi {
     final Condition condition = lock.newCondition();
     boolean isRefresh = false;
 
+	/**
+	 * アクセストーク取得済?
+	 * @return
+	 */
+	public boolean isOkAccessToken() {
+		boolean res = false;
+		if(accessToken != null) {
+			res = false;
+		}
+		return res;
+	}
 	public String requestAccessToken(String authorizationCode) throws IOException, MsgException{
 		if(this.checkTokenTimer != null){
 			this.checkTokenTimer.cancel();

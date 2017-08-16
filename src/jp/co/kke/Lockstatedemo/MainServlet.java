@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import jp.co.kke.Lockstatedemo.mng.MngGoogleApi;
 import jp.co.kke.Lockstatedemo.mng.MngLockApi;
+import jp.co.kke.Lockstatedemo.mng.MngSchedule;
 import jp.co.kke.Lockstatedemo.mng.svlt.AbstractMngMessage;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
 
@@ -49,14 +50,20 @@ public class MainServlet extends HttpServlet {
 	private Pattern apiPattern = Pattern.compile(".*/api/(.+)$");
 
 	/**
-	 * LockState API コントロールマネージャ
+	 * LockstatesAPI管理クラス
 	 */
-	private MngLockApi mngMngLockApi = new MngLockApi();
+	private MngLockApi mngLockApi = new MngLockApi();
 
 	/**
-	 *　Google API コントロールマネージャ
+	 * GoogleAPI管理クラス
 	 */
 	private MngGoogleApi mngGoogleApi = new MngGoogleApi();
+
+	/**
+	 *　スケジュールチェック定期実行管理クラス
+	 */
+	private MngSchedule mngSchedule = new MngSchedule(this);
+
 
 	/* (非 Javadoc)
 	 * サーブレット初期化
@@ -256,12 +263,27 @@ public class MainServlet extends HttpServlet {
 		return res;
 	}
 
+	/**
+	 * LockstatesAPI管理クラス取得
+	 * @return
+	 */
 	public MngLockApi getMngLockApi() {
-		return mngMngLockApi;
+		return mngLockApi;
 	}
-
+	/**
+	 * GoogleAPI管理クラス
+	 * @return
+	 */
 	public MngGoogleApi getMngGoogleApi() {
 		return mngGoogleApi;
+	}
+
+	/**
+	 * スケジュールチェック定期実行管理クラス
+	 * @return mngSchedule
+	 */
+	public MngSchedule getMngSchedule() {
+		return mngSchedule;
 	}
 
 }
