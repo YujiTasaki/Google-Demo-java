@@ -93,7 +93,7 @@ public class MngGoogleApi {
 	public boolean isOkAccessToken() {
 		boolean res = false;
 		if(accessToken != null) {
-			res = false;
+			res = true;
 		}
 		return res;
 	}
@@ -108,19 +108,19 @@ public class MngGoogleApi {
 		try {
 			lock.lock();
 			isRefresh = true;
-		if(this.checkTokenTimer != null){
-			this.checkTokenTimer.cancel();
-		}
-		this.checkTokenTimer = new Timer();
-		this.accessToken = null;
-		this.refreshToken = null;
-		this.updateToken = 0;
-		GoogleResOAuthInfo oAuthInfo = GoogleApiUtil.requestOAuthToken(authorizationCode);
-		this.accessToken = oAuthInfo.getAccess_token();
-		this.refreshToken = oAuthInfo.getRefresh_token();
-		this.updateToken = Calendar.getInstance().getTimeInMillis();
-		logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
-		this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, checkTokenMsec);
+			if(this.checkTokenTimer != null){
+				this.checkTokenTimer.cancel();
+			}
+			this.checkTokenTimer = new Timer();
+			this.accessToken = null;
+			this.refreshToken = null;
+			this.updateToken = 0;
+			GoogleResOAuthInfo oAuthInfo = GoogleApiUtil.requestOAuthToken(authorizationCode);
+			this.accessToken = oAuthInfo.getAccess_token();
+			this.refreshToken = oAuthInfo.getRefresh_token();
+			this.updateToken = Calendar.getInstance().getTimeInMillis();
+			logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
+			this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, checkTokenMsec);
 			condition.signalAll();// Signalを送ることで対応するConditionでawaitしていた処理が再開する。
 		} catch (Exception e) {
 			logger.error("can't request AccessToken", e);

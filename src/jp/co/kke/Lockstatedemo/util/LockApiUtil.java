@@ -384,8 +384,8 @@ public class LockApiUtil {
 	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
 	        if(param != null){//ボディーパラメータ有の場合
 	        	byte[] payload = param.toString().getBytes(S_CHARSET);
-	        connection.getOutputStream().write(payload);
-	        connection.getOutputStream().flush();
+	        	connection.getOutputStream().write(payload);
+	        	connection.getOutputStream().flush();
 	        }else {//ボディーパラメータ無の場合
 	        	connection.connect();
 	        }
@@ -433,6 +433,8 @@ public class LockApiUtil {
 		return res.toString();
 	}
 
+
+
 	/**
 	 * レスポンスコードがエラーコードか否か
 	 * @param responseCode
@@ -446,7 +448,6 @@ public class LockApiUtil {
         }
         return res;
 	}
-
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException, MsgException{

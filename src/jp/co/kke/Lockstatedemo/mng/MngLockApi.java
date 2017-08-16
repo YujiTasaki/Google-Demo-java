@@ -56,6 +56,7 @@ public class MngLockApi {
 	 */
 	private final Lock lock = new ReentrantLock();
 
+
 	/**
      * アクセストークン用コンディションクラス
      */
@@ -90,7 +91,7 @@ public class MngLockApi {
 	public boolean isOkAccessToken() {
 		boolean res = false;
 		if(accessToken != null) {
-			res = false;
+			res = true;
 		}
 		return res;
 	}
@@ -105,19 +106,20 @@ public class MngLockApi {
 		try {
 			lock.lock();
 			isRefresh = true;
-		if(this.checkTokenTimer != null){
-			this.checkTokenTimer.cancel();
-		}
-		this.checkTokenTimer = new Timer();
-		this.accessToken = null;
-		this.refreshToken = null;
-		this.updateToken = 0;
+
+			if(this.checkTokenTimer != null){
+				this.checkTokenTimer.cancel();
+			}
+			this.checkTokenTimer = new Timer();
+			this.accessToken = null;
+			this.refreshToken = null;
+			this.updateToken = 0;
 			LockResOAuthInfo oAuthInfo = LockApiUtil.requestOAuthToken(authorizationCode);
-		this.accessToken = oAuthInfo.getAccess_token();
-		this.refreshToken = oAuthInfo.getRefresh_token();
-		this.updateToken = Calendar.getInstance().getTimeInMillis();
-		logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
-		this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, this.checkTokenMsec);
+			this.accessToken = oAuthInfo.getAccess_token();
+			this.refreshToken = oAuthInfo.getRefresh_token();
+			this.updateToken = Calendar.getInstance().getTimeInMillis();
+			logger.info(String.format("init accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
+			this.checkTokenTimer.schedule(new OAuthTokeCheckTask(), 0, this.checkTokenMsec);
 			condition.signalAll();// Signalを送ることで対応するConditionでawaitしていた処理が再開する。
 		} catch (Exception e) {
 			logger.error("can't request AccessToken", e);
@@ -172,13 +174,12 @@ public class MngLockApi {
 			while(this.isRefresh){
 				condition.await();
 			}
-		res = LockApiUtil.getAllDevices(this.accessToken);
+			res = LockApiUtil.getAllDevices(this.accessToken);
 		} finally{
 			lock.unlock();
 		}
 		return res;
 	}
-
 
 	/**
 	 *　全デバイス情報の取得(返信オブジェクト形式)
@@ -213,7 +214,8 @@ public class MngLockApi {
 		LockResDataInfo res = null;
 		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
-			}
+		}
+
 		lock.lock();
 		try{
 			while(this.isRefresh){
