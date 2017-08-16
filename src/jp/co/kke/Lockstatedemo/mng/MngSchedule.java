@@ -96,6 +96,9 @@ public class MngSchedule {
 		}
 		logger.info(eventMap);
 
+		//API実行
+		mngLockApi.createUsers(null);
+
 		logger.info("doCheck:end");
 	}
 

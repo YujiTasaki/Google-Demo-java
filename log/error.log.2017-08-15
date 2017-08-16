@@ -1,0 +1,85 @@
+2017/07/26 16:08:36,129 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:369) error doApiRequest:
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+
+2017/07/26 16:09:39,849 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+
+2017/07/26 16:10:28,446 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+
+2017/07/26 16:11:15,516 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+
+2017/07/26 17:08:31,994 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:417) error doApiRequest:
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+

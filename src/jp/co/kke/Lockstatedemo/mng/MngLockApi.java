@@ -10,6 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
+import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResDataInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
@@ -227,4 +229,31 @@ public class MngLockApi {
 		}
 		return res;
 	}
+
+	/**
+	 * アクセスゲスト作成
+	 * @param info
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws Exception
+	 */
+	public LockResAccessPersonsInfo createUsers(LockReqAccessPersonsInfo info) throws Exception{
+		LockResAccessPersonsInfo res = null;
+		if(isOkAccessToken() == false){
+			throw new MsgException("未認証");
+		}
+
+		lock.lock();
+		try{
+			while(this.isRefresh){
+				condition.await();
+			}
+			res = LockApiUtil.createUsers(this.accessToken, info);
+		} finally{
+			lock.unlock();
+		}
+		return res;
+	}
+
+
+
 }

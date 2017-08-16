@@ -1,85 +1,15 @@
-2017/07/26 16:08:36,129 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:369) error doApiRequest:
-{
- "error": {
-  "errors": [
-   {
-    "domain": "global",
-    "reason": "authError",
-    "message": "Invalid Credentials",
-    "locationType": "header",
-    "location": "Authorization"
-   }
-  ],
-  "code": 401,
-  "message": "Invalid Credentials"
- }
-}
+2017/08/16 14:29:22,204 [ERROR] jp.co.kke.Lockstatedemo.util.LockApiUtil.doApiRequest(LockApiUtil.java:422) error doApiRequest:
+{"message":"Content-Type header must be \"application/json\"","type":null}
 
-2017/07/26 16:09:39,849 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
-{
- "error": {
-  "errors": [
-   {
-    "domain": "global",
-    "reason": "authError",
-    "message": "Invalid Credentials",
-    "locationType": "header",
-    "location": "Authorization"
-   }
-  ],
-  "code": 401,
-  "message": "Invalid Credentials"
- }
-}
+2017/08/16 14:30:18,297 [ERROR] jp.co.kke.Lockstatedemo.util.LockApiUtil.doApiRequest(LockApiUtil.java:422) error doApiRequest:
+{"message":"Content-Type header must be \"application/json\"","type":null}
 
-2017/07/26 16:10:28,446 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
-{
- "error": {
-  "errors": [
-   {
-    "domain": "global",
-    "reason": "authError",
-    "message": "Invalid Credentials",
-    "locationType": "header",
-    "location": "Authorization"
-   }
-  ],
-  "code": 401,
-  "message": "Invalid Credentials"
- }
-}
+2017/08/16 14:33:46,108 [ERROR] jp.co.kke.Lockstatedemo.util.LockApiUtil.doApiRequest(LockApiUtil.java:422) error doApiRequest:
+{"message":"Content-Type header must be \"application/json\"","type":null}
 
-2017/07/26 16:11:15,516 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:370) error doApiRequest:
-{
- "error": {
-  "errors": [
-   {
-    "domain": "global",
-    "reason": "authError",
-    "message": "Invalid Credentials",
-    "locationType": "header",
-    "location": "Authorization"
-   }
-  ],
-  "code": 401,
-  "message": "Invalid Credentials"
- }
-}
+2017/08/16 14:36:23,596 [ERROR] jp.co.kke.Lockstatedemo.util.LockApiUtil.doApiRequest(LockApiUtil.java:423) error doApiRequest:
+{"errors":[{"attribute":"pin","messages":["has already been taken"],"full_messages":["Pin has already been taken"]}]}
 
-2017/07/26 17:08:31,994 [ERROR] jp.co.kke.Lockstatedemo.util.GoogleApiUtil.doApiRequest(GoogleApiUtil.java:417) error doApiRequest:
-{
- "error": {
-  "errors": [
-   {
-    "domain": "global",
-    "reason": "authError",
-    "message": "Invalid Credentials",
-    "locationType": "header",
-    "location": "Authorization"
-   }
-  ],
-  "code": 401,
-  "message": "Invalid Credentials"
- }
-}
+2017/08/16 14:46:55,095 [ERROR] jp.co.kke.Lockstatedemo.util.LockApiUtil.doApiRequest(LockApiUtil.java:429) error doApiRequest:
+{"data":{"type":"access_guest","attributes":{"name":"KKEユーザー","email":"yumiko-tsunai@kke.co.jp","phone":null,"pin":"789012090","card_number":null,"department":null,"status":"upcoming","created_at":"2017-08-16T05:47:02Z","updated_at":"2017-08-16T05:47:02Z","starts_at":"2020-01-02T16:04:00","ends_at":"2020-01-02T16:05:00"},"id":"916a71bf-1691-4dfa-8cf0-bc3d1236877b","links":{"self":"https://api.lockstate.jp/access_persons/916a71bf-1691-4dfa-8cf0-bc3d1236877b"}}}
 

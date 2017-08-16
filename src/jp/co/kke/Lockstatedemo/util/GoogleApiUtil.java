@@ -288,7 +288,7 @@ public class GoogleApiUtil {
 		paramMap.put("orderBy", "startTime");
 		paramMap.put("singleEvents", "true");
 		paramMap.put("timeZone", "Asia/Tokyo");
-		OffsetDateTime updateMinDateTime = OffsetDateTime.now().minusSeconds(36000);
+		OffsetDateTime updateMinDateTime = OffsetDateTime.now().minusSeconds(65);  //今から65秒前以降のアップデートを取ってくる
 		paramMap.put("updatedMin", updateMinDateTime.format(DateTimeFormatter.ISO_INSTANT));
 		String param = convParam(paramMap);
 		String url = getCalendarEventsUrl(calendarId)+ "?" + param;

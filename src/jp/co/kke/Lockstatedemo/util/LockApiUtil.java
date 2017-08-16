@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockResAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResAttributesInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResDataInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResInfo;
@@ -68,6 +70,9 @@ public class LockApiUtil {
 	 * 全デバイス情報取得用URL
 	 */
 	private static final String S_API_ALL_DEVICES_URI    = S_API_ENDPOINT + "/devices";
+
+
+	private static final String S_API_CREATE_USERS_URI    = S_API_ENDPOINT + "/access_persons";
 
 
 	/**
@@ -208,6 +213,40 @@ public class LockApiUtil {
 	private static String getAllDevicesJson(String access_token) throws IOException, MsgException{
 		return doApiRequest(S_API_ALL_DEVICES_URI, "GET", access_token, null);
 	}
+
+
+	/**
+	 *アクセスゲストの作成(Json形式)
+	 * @param access_token
+	 * @param info
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static String createUsersJson(String access_token, LockReqAccessPersonsInfo info) throws IOException, MsgException{
+		ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(info);
+        logger.info(json);
+		return doApiRequest(S_API_CREATE_USERS_URI, "POST", access_token, json);
+	}
+
+
+
+	/**
+	 *アクセスゲストの作成(返信オブジェクト形式)
+	 * @param access_token
+	 * @param info
+	 * @return 返信データ(返信オブジェクト形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static LockResAccessPersonsInfo createUsers(String access_token, LockReqAccessPersonsInfo info) throws IOException, MsgException{
+		ObjectMapper mapper = new ObjectMapper();
+		String json = createUsersJson(access_token, info);
+		return mapper.readValue(json, LockResAccessPersonsInfo.class);
+	}
+
+
 	/**
 	 * デバイスの鍵の開閉(Json形式)
 	 * @param access_token
@@ -381,6 +420,7 @@ public class LockApiUtil {
 	        connection.setRequestMethod(method);
 	        connection.setRequestProperty( "Host" , "api.lockstate.jp");
 	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
+	        connection.setRequestProperty("Content-Type", "application/json");
 	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
 	        if(param != null){//ボディーパラメータ有の場合
 	        	byte[] payload = param.toString().getBytes(S_CHARSET);
@@ -392,11 +432,17 @@ public class LockApiUtil {
 	        InputStream stream;
 	        int responseCode = connection.getResponseCode();
 	        boolean isErroCode = isErrorCode(responseCode);
-	        if(isErroCode){
+	        logger.info(responseCode);
+	        stream = connection.getInputStream();
+	        if(stream == null) {
+	        	logger.info("stream == null");
 	        	stream = connection.getErrorStream();
-	        }else{
-	        	stream = connection.getInputStream();
 	        }
+//	        if(isErroCode){
+//	        	stream = connection.getErrorStream();
+//	        }else{
+//	        	stream = connection.getInputStream();
+//	        }
 	        reader  = new BufferedReader(new InputStreamReader(stream, S_CHARSET));
 	        String line = null;
 	        while((line = reader.readLine()) != null){
@@ -442,8 +488,8 @@ public class LockApiUtil {
 	 */
 	private static boolean isErrorCode(int responseCode){
 		boolean res = false;
-        if(responseCode != HttpURLConnection.HTTP_OK){
-        //if(responseCode / 100 == 4 || responseCode / 100 == 5){
+        //if(responseCode != HttpURLConnection.HTTP_OK){
+        if(responseCode / 100 == 4 || responseCode / 100 == 5){
         	res = true;
         }
         return res;
