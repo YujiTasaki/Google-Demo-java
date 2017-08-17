@@ -69,7 +69,17 @@ public class MngLockApi {
      * リフレッシュフラグ
      */
     boolean isRefresh = false;
+
     /**
+     * 選択したデバイスのデバイスID
+     */
+    private String deviceId = null;
+
+    public String getDeviceId() {
+		return deviceId;
+	}
+
+	/**
      * アクセストークン更新タイマタスククラス
      * @author KKE
      */
@@ -225,6 +235,7 @@ public class MngLockApi {
 				condition.await();
 			}
 			res = LockApiUtil.getLockResDataInfo(this.accessToken, serial_number);
+			deviceId = res.getId();
 		} finally{
 			lock.unlock();
 		}
@@ -275,6 +286,30 @@ public class MngLockApi {
 				condition.await();
 			}
 			res = LockApiUtil.setDeviceUsersJson(this.accessToken, access, userId);
+		} finally{
+			lock.unlock();
+		}
+		return res;
+	}
+
+	/**
+	 * アクセスゲストにメール送信
+	 * @param info
+	 * @return 返信データ(json形式)
+	 * @throws Exception
+	 */
+	public String sendEmail(String userId) throws Exception{
+		String res = null;
+		if(isOkAccessToken() == false){
+			throw new MsgException("未認証");
+		}
+
+		lock.lock();
+		try{
+			while(this.isRefresh){
+				condition.await();
+			}
+			res = LockApiUtil.sendEmailJson(this.accessToken, userId);
 		} finally{
 			lock.unlock();
 		}

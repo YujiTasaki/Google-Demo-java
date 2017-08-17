@@ -95,10 +95,25 @@ public class MngSchedule {
 		Map<String, List<List<String>>> eventMap = new HashMap<String, List<List<String>>>();
 		if(res != null)
 		{
-			eventMap = getEvent(calendarId, res);
+			eventMap = createEventList(calendarId, res);
 		}
 		logger.info(eventMap);
 
+		doConnectApi(mngLockApi, eventMap);
+
+		logger.info("doCheck:end");
+	}
+
+
+	/**
+	 * ConnectApi処理の実行
+	 * @param mngLockApi
+	 * @param eventMap
+	 * @throws Exception
+	 * @throws MsgException
+	 */
+	private void doConnectApi(MngLockApi mngLockApi, Map<String, List<List<String>>> eventMap)
+			throws Exception, MsgException {
 		//API実行
 		for(String key: eventMap.keySet())
 		{
@@ -131,22 +146,32 @@ public class MngSchedule {
 				String userId = resUser.getData().getId();
 				logger.info(userId);
 
-				//デバイスとの紐付け
-				String deviceId = "";
-				LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
-				//access.getAttributes().put("accessible_id", "08d2bf38-a7b6-41a6-93dd-52021a267b57");
-				access.getAttributes().put("accessible_id", "7888de18-1e1f-412e-8e26-75da5968cc7b");
-				access.getAttributes().put("accessible_type", "lock");
-				String resAccess = mngLockApi.setDeviceUsers(access, userId);
-				logger.info(resAccess);
-				//メール送信
-
-
-
+				if(userId == null)
+				{
+					throw new MsgException("アクセスゲストが作成されていません");
+				}
+				else
+				{
+					//デバイスとの紐付け
+					//String deviceId = "7888de18-1e1f-412e-8e26-75da5968cc7b";
+					String deviceId = mngLockApi.getDeviceId();
+					if(deviceId == null)
+					{
+						throw new MsgException("デバイス未設定");
+					}
+					else
+					{
+						LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
+						access.getAttributes().put("accessible_id", deviceId);
+						access.getAttributes().put("accessible_type", "lock");
+						String resAccess = mngLockApi.setDeviceUsers(access, userId);
+						logger.info(resAccess);
+						//メール送信
+						String resEmail = mngLockApi.sendEmail(userId);
+					}
+				}
 			}
 		}
-
-		logger.info("doCheck:end");
 	}
 
 
@@ -156,7 +181,7 @@ public class MngSchedule {
 	 * @param res
 	 * @return
 	 */
-	private Map<String, List<List<String>>> getEvent(String calendarId, GoogleResCalendarEventsListInfo res)
+	private Map<String, List<List<String>>> createEventList(String calendarId, GoogleResCalendarEventsListInfo res)
 	{
 		Map<String, List<List<String>>> eventMap = new HashMap<String, List<List<String>>>();
 		//resの中から必要な値を取ってくる

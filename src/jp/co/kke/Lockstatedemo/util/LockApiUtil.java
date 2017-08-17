@@ -117,7 +117,7 @@ public class LockApiUtil {
 	 * アクセスゲストとデバイス紐付け用URL
 	 * @param userId
 	 * @return
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	private static String getDeviceUsersUrl(String userId) throws UnsupportedEncodingException {
 		userId = URLEncoder.encode(userId, S_CHARSET);
@@ -126,6 +126,22 @@ public class LockApiUtil {
 		res.append("/access_persons/");
 		res.append(userId);
 		res.append("/accesses");
+		return res.toString();
+	}
+
+	/**
+	 * アクセスゲストにメール送信用URL
+	 * @param userId
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private static String sendEmailUrl(String userId) throws UnsupportedEncodingException {
+		userId = URLEncoder.encode(userId, S_CHARSET);
+		StringBuilder res = new StringBuilder();
+		res.append(S_API_ENDPOINT);
+		res.append("/access_persons/");
+		res.append(userId);
+		res.append("/email/notify");
 		return res.toString();
 	}
 
@@ -259,12 +275,10 @@ public class LockApiUtil {
 	 * @throws MsgException
 	 */
 	public static LockResAccessPersonsInfo createUsers(String access_token, LockReqAccessPersonsInfo info) throws IOException, MsgException{
-		logger.info(access_token);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = createUsersJson(access_token, info);
 		return mapper.readValue(json, LockResAccessPersonsInfo.class);
 	}
-
 
 	/**
 	 * アクセスゲストとデバイスの紐付け(Json形式)(返信オブジェクト形式は、不要)
@@ -275,12 +289,24 @@ public class LockApiUtil {
 	 * @throws MsgException
 	 */
 	public static String setDeviceUsersJson(String access_token, LockReqAccessPersonsAccess access, String userId) throws IOException, MsgException {
-		logger.info(access_token);
 		String url = getDeviceUsersUrl(userId);
 		ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(access);
         logger.info(json);
 		return doApiRequest(url, "POST", access_token, json);
+	}
+
+	/**
+	 * アクセスゲストにメール送信(Json形式)(返信オブジェクト形式は、不要)
+	 * @param access_token
+	 * @param access
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static String sendEmailJson(String access_token, String userId) throws IOException, MsgException {
+		String url = sendEmailUrl(userId);
+		return doApiRequest(url, "POST", access_token, null);
 	}
 
 	/**
@@ -457,6 +483,7 @@ public class LockApiUtil {
 	        connection.setRequestProperty( "Host" , "api.lockstate.jp");
 	        connection.setRequestProperty( "Accept" , "application/vnd.lockstate.v1+json");
 	        connection.setRequestProperty("Content-Type", "application/json");
+	        connection.setRequestProperty( "Accept-Language" , "ja");
 	        connection.setRequestProperty( "Authorization" , "Bearer " + access_token );
 	        if(param != null){//ボディーパラメータ有の場合
 	        	byte[] payload = param.toString().getBytes(S_CHARSET);

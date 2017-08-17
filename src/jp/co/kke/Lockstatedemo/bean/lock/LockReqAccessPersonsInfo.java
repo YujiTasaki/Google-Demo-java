@@ -10,43 +10,21 @@ public class LockReqAccessPersonsInfo {
 	private String type;
 	private Map<String,String> attributes = new LinkedHashMap<String, String>();
 
-
-
-
-
-
 	public String getType() {
 		return type;
 	}
-
-
-
 
 	public void setType(String type) {
 		this.type = type;
 	}
 
-
-
-
-
-
 	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
-
-
-
-
-
 	public void setAttributes(Map<String, String> attributes) {
 		this.attributes = attributes;
 	}
-
-
-
-
 
 
 //	public static void main(String[] args) throws Exception {
@@ -68,9 +46,6 @@ public class LockReqAccessPersonsInfo {
 		return builder.toString();
 	}
 
-
-
-
 	public static void main(String[] args) throws Exception {
 
 		LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
@@ -80,7 +55,4 @@ public class LockReqAccessPersonsInfo {
         String json = mapper.writeValueAsString(info);
         System.out.println(json);
 	}
-
-
-
 }

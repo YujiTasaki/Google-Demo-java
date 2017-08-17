@@ -9,9 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jp.co.kke.Lockstatedemo.bean.lock.LockResAttributesInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResDataInfo;
-import jp.co.kke.Lockstatedemo.bean.lock.LockResInfoList;
 import jp.co.kke.Lockstatedemo.mng.MsgException;
 import jp.co.kke.Lockstatedemo.mng.svlt.AbstractMngMessage;
 import jp.co.kke.Lockstatedemo.util.ServletUtil;
@@ -22,7 +20,8 @@ public class SetDevice extends AbstractMngMessage {
 	public void doJob(Map<String, Object> hArg, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		pharseArg(hArg);
-		LockResDataInfo lockResDataInfo = getDevice(id);
+		//LockResDataInfo lockResDataInfo = getDevice(id);
+		LockResDataInfo lockResDataInfo = this.getServlet().getMngLockApi().getLockResDataInfo(id);
 		if(lockResDataInfo == null) {
 			throw new MsgException(String.format("デバイスが存在しません:%s", id));
 		}
@@ -47,22 +46,22 @@ public class SetDevice extends AbstractMngMessage {
 	 * @param hArg
 	 * @throws Exception
 	 */
-	private LockResDataInfo getDevice(String serial_number) throws Exception{
-		LockResDataInfo res = null;
-		LockResInfoList lockResInfoList = this.getServlet().getMngLockApi().getAllDevices();
-		if(lockResInfoList == null) {
-			return null;
-		}
-		for(LockResDataInfo lockResDataInfo: lockResInfoList.getData()) {
-			LockResAttributesInfo tmpLockResAttributesInfo = lockResDataInfo.getAttributes();
-			String tmpSerial_number = tmpLockResAttributesInfo.getSerial_number();
-			if(serial_number.equals(tmpSerial_number)) {
-				res = lockResDataInfo;
-				break;
-			}
-		}
-		return res;
-	}
+//	private LockResDataInfo getDevice(String serial_number) throws Exception{
+//		LockResDataInfo res = null;
+//		LockResInfoList lockResInfoList = this.getServlet().getMngLockApi().getAllDevices();
+//		if(lockResInfoList == null) {
+//			return null;
+//		}
+//		for(LockResDataInfo lockResDataInfo: lockResInfoList.getData()) {
+//			LockResAttributesInfo tmpLockResAttributesInfo = lockResDataInfo.getAttributes();
+//			String tmpSerial_number = tmpLockResAttributesInfo.getSerial_number();
+//			if(serial_number.equals(tmpSerial_number)) {
+//				res = lockResDataInfo;
+//				break;
+//			}
+//		}
+//		return res;
+//	}
 
 
 
