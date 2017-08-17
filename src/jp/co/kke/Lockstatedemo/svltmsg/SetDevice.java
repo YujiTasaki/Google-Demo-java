@@ -22,11 +22,11 @@ public class SetDevice extends AbstractMngMessage {
 	public void doJob(Map<String, Object> hArg, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		pharseArg(hArg);
-		LockResAttributesInfo lockResAttributesInfo = getDevice(id);
-		if(lockResAttributesInfo == null) {
+		LockResDataInfo lockResDataInfo = getDevice(id);
+		if(lockResDataInfo == null) {
 			throw new MsgException(String.format("デバイスが存在しません:%s", id));
 		}
-		returnOk(request, response ,"発見!:" + lockResAttributesInfo.toString());
+		returnOk(request, response ,"発見!:" + lockResDataInfo.toString());
 	}
 
 	@Override
@@ -47,8 +47,8 @@ public class SetDevice extends AbstractMngMessage {
 	 * @param hArg
 	 * @throws Exception
 	 */
-	private LockResAttributesInfo getDevice(String serial_number) throws Exception{
-		LockResAttributesInfo res = null;
+	private LockResDataInfo getDevice(String serial_number) throws Exception{
+		LockResDataInfo res = null;
 		LockResInfoList lockResInfoList = this.getServlet().getMngLockApi().getAllDevices();
 		if(lockResInfoList == null) {
 			return null;
@@ -57,7 +57,7 @@ public class SetDevice extends AbstractMngMessage {
 			LockResAttributesInfo tmpLockResAttributesInfo = lockResDataInfo.getAttributes();
 			String tmpSerial_number = tmpLockResAttributesInfo.getSerial_number();
 			if(serial_number.equals(tmpSerial_number)) {
-				res = tmpLockResAttributesInfo;
+				res = lockResDataInfo;
 				break;
 			}
 		}

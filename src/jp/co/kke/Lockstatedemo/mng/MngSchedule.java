@@ -134,7 +134,8 @@ public class MngSchedule {
 				//デバイスとの紐付け
 				String deviceId = "";
 				LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
-				access.getAttributes().put("accessible_id", "08d2bf38-a7b6-41a6-93dd-52021a267b57");
+				//access.getAttributes().put("accessible_id", "08d2bf38-a7b6-41a6-93dd-52021a267b57");
+				access.getAttributes().put("accessible_id", "7888de18-1e1f-412e-8e26-75da5968cc7b");
 				access.getAttributes().put("accessible_type", "lock");
 				String resAccess = mngLockApi.setDeviceUsers(access, userId);
 				logger.info(resAccess);
