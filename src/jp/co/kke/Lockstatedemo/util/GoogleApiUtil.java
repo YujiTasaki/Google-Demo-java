@@ -8,8 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -274,6 +272,27 @@ public class GoogleApiUtil {
 		return mapper.readValue(json, GoogleResCreateChannelInfo.class);
 	}
 
+//	/**
+//	 * 更新カレンダ取得
+//	 * @param calendarId
+//	 * @param access_token
+//	 * @return
+//	 * @throws MessagingException
+//	 * @throws IOException
+//	 * @throws MsgException
+//	 */
+//	public static String getCalendarEventListJson(String calendarId, String access_token) throws MessagingException, IOException, MsgException{
+//		Map<String, String> paramMap = new HashMap<String, String>();
+//		paramMap.put("orderBy", "startTime");
+//		paramMap.put("singleEvents", "true");
+//		paramMap.put("timeZone", "Asia/Tokyo");
+//		OffsetDateTime updateMinDateTime = OffsetDateTime.now().minusSeconds(60);  //今から60秒前以降のアップデートを取ってくる
+//		paramMap.put("updatedMin", updateMinDateTime.format(DateTimeFormatter.ISO_INSTANT));
+//		String param = convParam(paramMap);
+//		String url = getCalendarEventsUrl(calendarId)+ "?" + param;
+//		logger.info("url:" + url);
+//		return doApiRequest(url, "GET", access_token, null);
+//	}
 	/**
 	 * 更新カレンダ取得
 	 * @param calendarId
@@ -283,19 +302,17 @@ public class GoogleApiUtil {
 	 * @throws IOException
 	 * @throws MsgException
 	 */
-	public static String getCalendarEventListJson(String calendarId, String access_token) throws MessagingException, IOException, MsgException{
+	public static String getCalendarEventListJson(String calendarId, String updatedMin, String access_token) throws MessagingException, IOException, MsgException{
 		Map<String, String> paramMap = new HashMap<String, String>();
-		paramMap.put("orderBy", "startTime");
+		paramMap.put("orderBy", "updated");
 		paramMap.put("singleEvents", "true");
 		paramMap.put("timeZone", "Asia/Tokyo");
-		OffsetDateTime updateMinDateTime = OffsetDateTime.now().minusSeconds(65);  //今から65秒前以降のアップデートを取ってくる
-		paramMap.put("updatedMin", updateMinDateTime.format(DateTimeFormatter.ISO_INSTANT));
+		paramMap.put("updatedMin", updatedMin);
 		String param = convParam(paramMap);
 		String url = getCalendarEventsUrl(calendarId)+ "?" + param;
 		logger.info("url:" + url);
 		return doApiRequest(url, "GET", access_token, null);
 	}
-
 	/**
 	 * 更新カレンダ取得
 	 * @param calendarId
@@ -305,9 +322,9 @@ public class GoogleApiUtil {
 	 * @throws IOException
 	 * @throws MsgException
 	 */
-	public static GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId, String access_token) throws MessagingException, IOException, MsgException{
+	public static GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId, String updateMin, String access_token) throws MessagingException, IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
-		String json = getCalendarEventListJson(calendarId, access_token);
+		String json = getCalendarEventListJson(calendarId, updateMin, access_token);
 		logger.info("getCalendarEventList:"+json);
 		return mapper.readValue(json, GoogleResCalendarEventsListInfo.class);
 	}

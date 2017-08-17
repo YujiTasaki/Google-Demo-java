@@ -1,6 +1,8 @@
 package jp.co.kke.Lockstatedemo.mng;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,9 @@ public class MngSchedule {
 	 * チェックタイマクラス
 	 */
 	private Timer checkTimer = new Timer();
+
+
+	private String updateMin = null;
 
 	/**
 	 * コンストラクタ
@@ -89,8 +94,13 @@ public class MngSchedule {
 			throw new MsgException("Google未承認");
 		}
 
+		if(updateMin == null)
+		{
+			OffsetDateTime updateMinDateTime = OffsetDateTime.now();  //現在時刻
+			updateMin = updateMinDateTime.format(DateTimeFormatter.ISO_INSTANT);
+		}
 		String calendarId = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID");
-		GoogleResCalendarEventsListInfo res = getMngGoogleApi().getCalendarEventList(calendarId);
+		GoogleResCalendarEventsListInfo res = getMngGoogleApi().getCalendarEventList(calendarId, updateMin);
 
 		Map<String, List<List<String>>> eventMap = new HashMap<String, List<List<String>>>();
 		if(res != null)
@@ -100,6 +110,8 @@ public class MngSchedule {
 		logger.info(eventMap);
 
 		doConnectApi(mngLockApi, eventMap);
+		logger.info("最終更新時間");
+		logger.info(updateMin);
 
 		logger.info("doCheck:end");
 	}
@@ -123,52 +135,64 @@ public class MngSchedule {
 			String status = datas.get(0);
 			String startAt = datas.get(1);
 			String endAt = datas.get(2);
+			String update = datas.get(3);
+			updateMin = update;
 
 			for(int i=0; i<attendees.size(); i++) {
 
+				//アクセスゲストの作成
 				String email = attendees.get(i);
 				String name = email;
-				String pinCode = "";
-				for(int r=0; r<8; r++) {
-					Random rnd = new Random();
-					pinCode = pinCode + String.valueOf(rnd.nextInt(10));
-				}
-
-				//アクセスゲストの作成
 				LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
 				info.setType("access_guest");
 				info.getAttributes().put("name", name);
 				info.getAttributes().put("email", email);
-				info.getAttributes().put("pin", pinCode);
 				info.getAttributes().put("starts_at", startAt);
 				info.getAttributes().put("ends_at", endAt);
-				LockResAccessPersonsInfo resUser = mngLockApi.createUsers(info);
+
+				LockResAccessPersonsInfo resUser=null;
+				for (int j = 0; j < 5; j++) {
+					try {
+						String pinCode = "";
+						for (int r = 0; r < 8; r++) {
+							Random rnd = new Random();
+							pinCode = pinCode + String.valueOf(rnd.nextInt(10));
+						}
+						info.getAttributes().put("pin", pinCode);
+						resUser = mngLockApi.createUsers(info);
+
+					} catch (Exception e) {
+						logger.error(e);
+					}
+					if(resUser!=null) {
+						break;
+					}
+				}
+
+				if(resUser==null) {
+					//システム管理者にメールする？
+					throw new MsgException("アクセスゲスト作成時にPINコードが5回以上重複しました。不要なPINコードを削除してください。");
+				}
+
 				String userId = resUser.getData().getId();
 				logger.info(userId);
 
-				if(userId == null)
+				//デバイスとの紐付け
+				//String deviceId = "7888de18-1e1f-412e-8e26-75da5968cc7b";
+				String deviceId = mngLockApi.getDeviceId();
+				if(deviceId == null)
 				{
-					throw new MsgException("アクセスゲストが作成されていません");
+					throw new MsgException("デバイス未設定");
 				}
 				else
 				{
-					//デバイスとの紐付け
-					//String deviceId = "7888de18-1e1f-412e-8e26-75da5968cc7b";
-					String deviceId = mngLockApi.getDeviceId();
-					if(deviceId == null)
-					{
-						throw new MsgException("デバイス未設定");
-					}
-					else
-					{
-						LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
-						access.getAttributes().put("accessible_id", deviceId);
-						access.getAttributes().put("accessible_type", "lock");
-						String resAccess = mngLockApi.setDeviceUsers(access, userId);
-						logger.info(resAccess);
-						//メール送信
-						String resEmail = mngLockApi.sendEmail(userId);
-					}
+					LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
+					access.getAttributes().put("accessible_id", deviceId);
+					access.getAttributes().put("accessible_type", "lock");
+					String resAccess = mngLockApi.setDeviceUsers(access, userId);
+					logger.info(resAccess);
+					//メール送信
+					String resEmail = mngLockApi.sendEmail(userId);
 				}
 			}
 		}
@@ -196,6 +220,15 @@ public class MngSchedule {
 			List<String> infoList = new ArrayList<String>();
 			String status = items.getStatus();
 			String startAt = items.getStart().getDateTime();
+			String update = items.getUpdated();
+
+			//更新時間が前回の処理実行したイベントの最終時間とイコールの場合は、イベントMapに追加しない
+			if(update.equals(updateMin))
+			{
+				logger.info("含まれる" + update);
+				continue;
+			}
+
 			if(startAt == null)
 			{
 				startAt = items.getStart().getDate();
@@ -212,6 +245,7 @@ public class MngSchedule {
 			infoList.add(status);
 			infoList.add(startAt);
 			infoList.add(endAt);
+			infoList.add(update);
 
 			//参加者メールリスト
 			List<String> attendEmailList = new ArrayList<String>();

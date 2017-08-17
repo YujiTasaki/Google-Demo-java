@@ -79,7 +79,9 @@ public class MngGoogleApi {
 			if((accessToken == null)|(refreshToken == null)){
 				return;
 			}
+			//現在時刻（ミリ秒）
 			long curMsec = Calendar.getInstance().getTimeInMillis();
+			//updateToken→アクセストークンを取得したタイミングのミリ秒
 			if(curMsec < (updateToken + limitTokenMsec)){
 				return;
 			}
@@ -193,7 +195,7 @@ public class MngGoogleApi {
 	 * @return
 	 * @throws Exception
 	 */
-	public GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId) throws Exception{
+	public GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId, String updateMin) throws Exception{
 		GoogleResCalendarEventsListInfo res = null;
 		if(isOkAccessToken() == false){
 			throw new MsgException("未認証");
@@ -203,7 +205,7 @@ public class MngGoogleApi {
 			while(this.isRefresh){
 				condition.await();
 			}
-			res = GoogleApiUtil.getCalendarEventList(calendarId, this.accessToken);
+			res = GoogleApiUtil.getCalendarEventList(calendarId, updateMin, this.accessToken);
 		} finally{
 			lock.unlock();
 		}
