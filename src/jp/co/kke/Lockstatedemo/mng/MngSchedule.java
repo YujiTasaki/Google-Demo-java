@@ -15,6 +15,7 @@ import jp.co.kke.Lockstatedemo.MainServlet;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventAttendeeInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventInfo;
 import jp.co.kke.Lockstatedemo.bean.google.GoogleResCalendarEventsListInfo;
+import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsAccess;
 import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.util.SysParamUtil;
@@ -129,6 +130,18 @@ public class MngSchedule {
 				LockResAccessPersonsInfo resUser = mngLockApi.createUsers(info);
 				String userId = resUser.getData().getId();
 				logger.info(userId);
+
+				//デバイスとの紐付け
+				String deviceId = "";
+				LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
+				access.getAttributes().put("accessible_id", "08d2bf38-a7b6-41a6-93dd-52021a267b57");
+				access.getAttributes().put("accessible_type", "lock");
+				String resAccess = mngLockApi.setDeviceUsers(access, userId);
+				logger.info(resAccess);
+				//メール送信
+
+
+
 			}
 		}
 

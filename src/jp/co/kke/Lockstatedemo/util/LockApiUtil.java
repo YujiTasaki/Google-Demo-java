@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsAccess;
 import jp.co.kke.Lockstatedemo.bean.lock.LockReqAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResAccessPersonsInfo;
 import jp.co.kke.Lockstatedemo.bean.lock.LockResAttributesInfo;
@@ -71,9 +72,10 @@ public class LockApiUtil {
 	 */
 	private static final String S_API_ALL_DEVICES_URI    = S_API_ENDPOINT + "/devices";
 
-
+    /**
+     * アクセスゲスト作成用URL
+     */
 	private static final String S_API_CREATE_USERS_URI    = S_API_ENDPOINT + "/access_persons";
-
 
 	/**
 	 * 通信用文字コード
@@ -108,6 +110,22 @@ public class LockApiUtil {
 		}else{
 			res.append("unlock");
 		}
+		return res.toString();
+	}
+
+	/**
+	 * アクセスゲストとデバイス紐付け用URL
+	 * @param userId
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	private static String getDeviceUsersUrl(String userId) throws UnsupportedEncodingException {
+		userId = URLEncoder.encode(userId, S_CHARSET);
+		StringBuilder res = new StringBuilder();
+		res.append(S_API_ENDPOINT);
+		res.append("/access_persons/");
+		res.append(userId);
+		res.append("/accesses");
 		return res.toString();
 	}
 
@@ -241,11 +259,29 @@ public class LockApiUtil {
 	 * @throws MsgException
 	 */
 	public static LockResAccessPersonsInfo createUsers(String access_token, LockReqAccessPersonsInfo info) throws IOException, MsgException{
+		logger.info(access_token);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = createUsersJson(access_token, info);
 		return mapper.readValue(json, LockResAccessPersonsInfo.class);
 	}
 
+
+	/**
+	 * アクセスゲストとデバイスの紐付け(Json形式)(返信オブジェクト形式は、不要)
+	 * @param access_token
+	 * @param access
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static String setDeviceUsersJson(String access_token, LockReqAccessPersonsAccess access, String userId) throws IOException, MsgException {
+		logger.info(access_token);
+		String url = getDeviceUsersUrl(userId);
+		ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(access);
+        logger.info(json);
+		return doApiRequest(url, "POST", access_token, json);
+	}
 
 	/**
 	 * デバイスの鍵の開閉(Json形式)
