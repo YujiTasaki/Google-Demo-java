@@ -18,9 +18,9 @@ public class TestGetCalendarList {
 		String access_token = "ya29.GluUBPUO1SB-odd5SHRfVxXOE3vLAs3iLRkf-m0NJt7BPxr2eY_sZXX1lEv959ejwELZH2ZJLQo63fTtP8XqPvEbSuKUNM7swVZAAJXXd0zsYYvzPDyXrGGzpDKa";
 		//String calendarId = "miyake@kke.co.jp";
 		String calendarId = "kke.co.jp_2d3337313238383832353636@resource.calendar.google.com";
-		String json = GoogleApiUtil.getCalendarEventListJson(calendarId, access_token);
+		String json = GoogleApiUtil.getCalendarEventListJson(calendarId, null, access_token);
 		System.out.println("res:\n" + json);
-		GoogleResCalendarEventsListInfo res = GoogleApiUtil.getCalendarEventList(calendarId, access_token);
+		GoogleResCalendarEventsListInfo res = GoogleApiUtil.getCalendarEventList(calendarId, null, access_token);
 		System.out.println("res:\n" + res.toString());
 		List<GoogleResCalendarEventInfo> items = res.getItems();
 		if(items== null) {

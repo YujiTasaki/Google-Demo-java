@@ -63,6 +63,20 @@ public class MngSchedule {
 			logger.info("ScheduleCheckTask:no");
 		}
 	}
+
+	/**
+	 * スケジュールの停止
+	 */
+	public void close(){
+		try {
+			if(this.checkTimer != null){
+				this.checkTimer.cancel();
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+
 	/**
  * LockstatesAPI管理クラス
 	 * @return
@@ -76,6 +90,14 @@ public class MngSchedule {
 	 */
 	public MngGoogleApi getMngGoogleApi() {
 		return mainServlet.getMngGoogleApi();
+	}
+
+	/**
+	 * DBアクセス管理クラス
+	 * @return
+	 */
+	public MngDbLockParam getMngDbLockParam() {
+		return mainServlet.getMngDbLockParam();
 	}
 
 	/**

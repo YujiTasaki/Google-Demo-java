@@ -89,6 +89,20 @@ public class MngGoogleApi {
 		}
 	}
 	/**
+	 * スケジュールの停止
+	 */
+	public void close(){
+		try {
+			if(this.checkTokenTimer != null){
+				this.checkTokenTimer.cancel();
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+
+
+	/**
 	 * アクセストーク取得済か否か
 	 * @return
 	 */

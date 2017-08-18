@@ -96,7 +96,18 @@ public class MngLockApi {
 			refreshAccessToken();
 		}
 	}
-
+	/**
+	 * スケジュールの停止
+	 */
+	public void close(){
+		try {
+			if(this.checkTokenTimer != null){
+				this.checkTokenTimer.cancel();
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
 	/**
 	 * アクセストーク取得済?
 	 * @return

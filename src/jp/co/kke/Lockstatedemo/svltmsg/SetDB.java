@@ -25,8 +25,7 @@ public class SetDB extends AbstractMngMessage {
 	@Override
 	public void doJob(Map<String, Object> hArg, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		pharseArg(hArg);
-
-		//this.getServlet().getMngDbLockParam().insertSample(name, Calendar.getInstance());
+		this.getServlet().getMngDbLockParam().insertSample(name, Calendar.getInstance());
 		returnOk(request, response);
 	}
 

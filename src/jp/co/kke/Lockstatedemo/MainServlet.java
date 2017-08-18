@@ -11,13 +11,13 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import jp.co.kke.Lockstatedemo.mng.MngDbLockParam;
 import jp.co.kke.Lockstatedemo.mng.MngGoogleApi;
 import jp.co.kke.Lockstatedemo.mng.MngLockApi;
 import jp.co.kke.Lockstatedemo.mng.MngSchedule;
@@ -31,7 +31,7 @@ import jp.co.kke.Lockstatedemo.util.SysParamUtil;
  * http://localhost:8080/LockstateDemo/api/*
  * Servlet implementation class MainServlet
  */
-@WebServlet("/api/*")
+//@WebServlet("/api/*")
 public class MainServlet extends HttpServlet {
 
 	/**
@@ -47,22 +47,30 @@ public class MainServlet extends HttpServlet {
 	/**
 	 * api用　urlパタン
 	 */
+	/**
+	 *
+	 */
 	private Pattern apiPattern = Pattern.compile(".*/api/(.+)$");
 
 	/**
 	 * LockstatesAPI管理クラス
 	 */
-	private MngLockApi mngLockApi = new MngLockApi();
+	private MngLockApi mngLockApi = null;
 
 	/**
 	 * GoogleAPI管理クラス
 	 */
-	private MngGoogleApi mngGoogleApi = new MngGoogleApi();
+	private MngGoogleApi mngGoogleApi = null;
 
 	/**
 	 *　スケジュールチェック定期実行管理クラス
 	 */
-	private MngSchedule mngSchedule = new MngSchedule(this);
+	private MngSchedule mngSchedule = null;
+
+	/**
+	 * DBアクセス管理クラス
+	 */
+	private MngDbLockParam mngDbLockParam = null;
 
 
 	/* (非 Javadoc)
@@ -75,6 +83,10 @@ public class MainServlet extends HttpServlet {
 		try {
 			String realPath = getServletContext().getRealPath("/");
 			realPath = SysParamUtil.getResourceString("DIR_PATH", realPath);
+			this.mngDbLockParam = new MngDbLockParam(realPath);
+			this.mngLockApi = new MngLockApi();
+			this.mngGoogleApi = new MngGoogleApi();
+			this.mngSchedule = new MngSchedule(this);
 		} catch (Exception e) {
 			logger.error("init", e);
 			throw new ServletException(e);
@@ -84,7 +96,18 @@ public class MainServlet extends HttpServlet {
 	@Override
 	public void destroy() {
 		super.destroy();
-
+		if(this.mngSchedule != null) {
+			this.mngSchedule.close();
+		}
+		if(this.mngGoogleApi != null) {
+			this.mngGoogleApi.close();
+		}
+		if(this.mngLockApi != null) {
+			this.mngLockApi.close();
+		}
+		if(this.mngDbLockParam != null) {
+			this.mngDbLockParam.close();
+		}
 	}
 
 	/**
@@ -284,6 +307,13 @@ public class MainServlet extends HttpServlet {
 	 */
 	public MngSchedule getMngSchedule() {
 		return mngSchedule;
+	}
+
+	/**
+	 * @return mngDbLockParam
+	 */
+	public MngDbLockParam getMngDbLockParam() {
+		return mngDbLockParam;
 	}
 
 }
