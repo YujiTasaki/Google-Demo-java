@@ -167,7 +167,7 @@ public class MngDbLockParam {
 			rs = preparedStatement.executeQuery();
 			// データ格納
 			if(rs.next()) {
-				res = rs.getString("key");
+				res = rs.getString("val");
 			}
 	    }finally{
 			//Statement,ResultSetのみクローズ
@@ -254,7 +254,8 @@ public class MngDbLockParam {
 	}
 
 	public static void main(String[] args) throws MessagingException, IOException, MsgException, ClassNotFoundException, SQLException {
-		String realPath = "D:\\Data\\ProgramData\\Eclipse\\workspaces\\Lock\\LockStateCalendar\\LockstateDemo\\WebContent";
+		//String realPath = "D:\\Data\\ProgramData\\Eclipse\\workspaces\\Lock\\LockStateCalendar\\LockstateDemo\\WebContent";
+		String realPath = "C:\\workspace\\LockstateDemo\\WebContent";
 		MngDbLockParam mngDbLockParam = new MngDbLockParam(realPath);
 		mngDbLockParam.insertSample("test1", Calendar.getInstance());
 		mngDbLockParam.insertSample("test2", Calendar.getInstance());

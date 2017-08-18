@@ -82,7 +82,9 @@ public class MainServlet extends HttpServlet {
 		super.init(config);
 		try {
 			String realPath = getServletContext().getRealPath("/");
+			logger.info("自動取得リアルパス" + realPath);
 			realPath = SysParamUtil.getResourceString("DIR_PATH", realPath);
+			logger.info("設定ファイルリアルパス" + realPath);
 			this.mngDbLockParam = new MngDbLockParam(realPath);
 			this.mngLockApi = new MngLockApi();
 			this.mngGoogleApi = new MngGoogleApi();
