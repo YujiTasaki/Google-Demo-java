@@ -181,6 +181,7 @@ public class MngSchedule {
 							pinCode = pinCode + String.valueOf(rnd.nextInt(10));
 						}
 						info.getAttributes().put("pin", pinCode);
+						logger.info("PINコード" + pinCode);
 						resUser = mngLockApi.createUsers(info);
 
 					} catch (Exception e) {
@@ -193,7 +194,7 @@ public class MngSchedule {
 
 				if(resUser==null) {
 					//システム管理者にメールする？
-					throw new MsgException("アクセスゲスト作成時にPINコードが5回以上重複しました。不要なPINコードを削除してください。");
+					throw new MsgException("アクセスゲスト作成に5回以上失敗しました。不要なPINコードを削除してください。もしくは入力データが間違っている可能性がございます。");
 				}
 
 				String userId = resUser.getData().getId();
@@ -255,18 +256,28 @@ public class MngSchedule {
 			{
 				startAt = items.getStart().getDate();
 			}
-			startAt = startAt.substring(0, 19);
+			//startAt = startAt.substring(0, 19);
 
 			String endAt = items.getEnd().getDateTime();
 			if(endAt == null)
 			{
 				endAt = items.getEnd().getDate();
 			}
-			endAt = endAt.substring(0, 19);
+			//endAt = endAt.substring(0, 19);
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+			//開始時刻10分前
+			OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
+			String startAtMinusStr = startAtMinus.format(formatter);
+
+			//終了時刻10分後
+			OffsetDateTime endAtPlus = OffsetDateTime.parse(endAt).plusSeconds(600);
+			String endAtPlusStr = endAtPlus.format(formatter);
 
 			infoList.add(status);
-			infoList.add(startAt);
-			infoList.add(endAt);
+			infoList.add(startAtMinusStr);
+			infoList.add(endAtPlusStr);
 			infoList.add(update);
 
 			//参加者メールリスト

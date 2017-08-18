@@ -1,38 +1,41 @@
 package jp.co.kke.Lockstatedemo.test;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TestConvertDate {
 
 	public static void main(String[] args) throws ParseException {
 
 		//開始時刻
-		String startAt = "2017-08-18T06:00:00+09:00";
-		//+09:00
-		//DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-		//java.util.Date startAtDate = df.parse(startAt);
+		String startAt = "2017-08-18T10:15:00+09:00";
 
-		//System.out.println(startAtDate);
+		//Date dt = new Date();
+		//System.out.println(dt);
 
-		//Calendar cal = Calendar.getInstance();
-		//cal.setTime(startAtDate);
+		//Calendar calendar = Calendar.getInstance();
+		//System.out.println(calendar.getTime().toString());
 
-		//Date date = new Date(startAtDate + 1000 * 60 * 60 * 3);
+		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-		Date dt = new Date();
-		System.out.println(dt);
+		//開始時刻10分前
+		OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
+		System.out.println(startAtMinus.format(formatter));
 
-		Calendar calendar = Calendar.getInstance();
-		System.out.println(calendar.getTime().toString());
-
-		DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-		System.out.println(df.parse(startAt));
+		//開始時刻10分後
+		OffsetDateTime startAtPlus = OffsetDateTime.parse(startAt).plusSeconds(600);
+		System.out.println(startAtPlus.format(formatter));
 
 
+		OffsetDateTime updateMinDateTime2 = OffsetDateTime.now().minusSeconds(60);  //今から60秒前以降のアップデートを取ってくる
+        System.out.println(updateMinDateTime2.format(formatter));
+
+        String dateStr= "2017-08-18T14:43:47+09:00";
+
+        OffsetDateTime dateTime =  OffsetDateTime.parse(dateStr,formatter);
+        System.out.println(dateTime);
 
 
 	}
