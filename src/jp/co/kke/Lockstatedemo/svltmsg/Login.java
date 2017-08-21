@@ -35,6 +35,7 @@ public class Login extends AbstractMngMessage{
 		ResponseInfo responseInfo = new ResponseInfo();
 		responseInfo.setState(ResponseInfo.S_State_NG);
 		responseInfo.setMsg(e.getMessage());
+		response.setStatus(400);
 		ServletUtil.returnJson(response, responseInfo, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
