@@ -132,6 +132,7 @@ public class MngSchedule {
 		logger.info(eventMap);
 
 		doConnectApi(mngLockApi, eventMap);
+
 		logger.info("最終更新時間");
 		logger.info(updateMin);
 
@@ -242,67 +243,71 @@ public class MngSchedule {
 			//イベント情報
 			List<String> infoList = new ArrayList<String>();
 			String status = items.getStatus();
-			String startAt = items.getStart().getDateTime();
-			String update = items.getUpdated();
 
-			//更新時間が前回の処理実行したイベントの最終時間とイコールの場合は、イベントMapに追加しない
-			if(update.equals(updateMin))
+			if(status.equals("confirmed"))
 			{
-				logger.info("含まれる" + update);
-				continue;
-			}
+				String startAt = items.getStart().getDateTime();
+				String update = items.getUpdated();
 
-			if(startAt == null)
-			{
-				startAt = items.getStart().getDate();
-			}
-			//startAt = startAt.substring(0, 19);
+				//更新時間が前回の処理実行したイベントの最終時間とイコールの場合は、イベントMapに追加しない
+				if(update.equals(updateMin))
+				{
+					logger.info("含まれる" + update);
+					continue;
+				}
 
-			String endAt = items.getEnd().getDateTime();
-			if(endAt == null)
-			{
-				endAt = items.getEnd().getDate();
-			}
-			//endAt = endAt.substring(0, 19);
+				if(startAt == null)
+				{
+					startAt = items.getStart().getDate();
+				}
+				//startAt = startAt.substring(0, 19);
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+				String endAt = items.getEnd().getDateTime();
+				if(endAt == null)
+				{
+					endAt = items.getEnd().getDate();
+				}
+				//endAt = endAt.substring(0, 19);
 
-			//開始時刻10分前
-			OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
-			String startAtMinusStr = startAtMinus.format(formatter);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-			//終了時刻10分後
-			OffsetDateTime endAtPlus = OffsetDateTime.parse(endAt).plusSeconds(600);
-			String endAtPlusStr = endAtPlus.format(formatter);
+				//開始時刻10分前
+				OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
+				String startAtMinusStr = startAtMinus.format(formatter);
 
-			infoList.add(status);
-			infoList.add(startAtMinusStr);
-			infoList.add(endAtPlusStr);
-			infoList.add(update);
+				//終了時刻10分後
+				OffsetDateTime endAtPlus = OffsetDateTime.parse(endAt).plusSeconds(600);
+				String endAtPlusStr = endAtPlus.format(formatter);
 
-			//参加者メールリスト
-			List<String> attendEmailList = new ArrayList<String>();
-			String email = items.getCreator().getEmail();
-			attendEmailList.add(email);
-			List<GoogleResCalendarEventAttendeeInfo> attendees = items.getAttendees();
-			if(attendees != null)
-			{
+				infoList.add(status);
+				infoList.add(startAtMinusStr);
+				infoList.add(endAtPlusStr);
+				infoList.add(update);
 
-				for(int j=0; j<attendees.size(); j++){
-					String attendEmail = attendees.get(j).getEmail();
-					//attendeesのうち登録者、アカウントユーザーを外す
-					if((!attendEmail.equals(email)) && (!attendEmail.equals(SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID"))))
-					{
-						attendEmailList.add(attendEmail);
+				//参加者メールリスト
+				List<String> attendEmailList = new ArrayList<String>();
+				String email = items.getCreator().getEmail();
+				attendEmailList.add(email);
+				List<GoogleResCalendarEventAttendeeInfo> attendees = items.getAttendees();
+				if(attendees != null)
+				{
+
+					for(int j=0; j<attendees.size(); j++){
+						String attendEmail = attendees.get(j).getEmail();
+						//attendeesのうち登録者、アカウントユーザーを外す
+						if((!attendEmail.equals(email)) && (!attendEmail.equals(SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID"))))
+						{
+							attendEmailList.add(attendEmail);
+						}
 					}
 				}
+
+				List<List<String>> valueList = new ArrayList<List<String>>();
+				valueList.add(infoList);
+				valueList.add(attendEmailList);
+
+				eventMap.put(eventId,valueList);
 			}
-
-			List<List<String>> valueList = new ArrayList<List<String>>();
-			valueList.add(infoList);
-			valueList.add(attendEmailList);
-
-			eventMap.put(eventId,valueList);
 		}
 		return eventMap;
 	}
