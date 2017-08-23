@@ -246,7 +246,6 @@ public class MngSchedule {
 
 			if(status.equals("confirmed"))
 			{
-				String startAt = items.getStart().getDateTime();
 				String update = items.getUpdated();
 
 				//更新時間が前回の処理実行したイベントの最終時間とイコールの場合は、イベントMapに追加しない
@@ -256,33 +255,46 @@ public class MngSchedule {
 					continue;
 				}
 
+				//2017/8/23 修正
+				boolean dayFlg = false;
+				String startAt = items.getStart().getDateTime();
 				if(startAt == null)
 				{
 					startAt = items.getStart().getDate();
+					dayFlg = true;
 				}
-				//startAt = startAt.substring(0, 19);
 
 				String endAt = items.getEnd().getDateTime();
 				if(endAt == null)
 				{
 					endAt = items.getEnd().getDate();
+					dayFlg = true;
 				}
-				//endAt = endAt.substring(0, 19);
 
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+				if(dayFlg == false)
+				{
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-				//開始時刻10分前
-				OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
-				String startAtMinusStr = startAtMinus.format(formatter);
+					//開始時刻10分前
+					OffsetDateTime startAtMinus = OffsetDateTime.parse(startAt).minusSeconds(600);
+					String startAtMinusStr = startAtMinus.format(formatter);
 
-				//終了時刻10分後
-				OffsetDateTime endAtPlus = OffsetDateTime.parse(endAt).plusSeconds(600);
-				String endAtPlusStr = endAtPlus.format(formatter);
+					//終了時刻10分後
+					OffsetDateTime endAtPlus = OffsetDateTime.parse(endAt).plusSeconds(600);
+					String endAtPlusStr = endAtPlus.format(formatter);
 
-				infoList.add(status);
-				infoList.add(startAtMinusStr);
-				infoList.add(endAtPlusStr);
-				infoList.add(update);
+					infoList.add(status);
+					infoList.add(startAtMinusStr);
+					infoList.add(endAtPlusStr);
+					infoList.add(update);
+				}
+				else
+				{
+					infoList.add(status);
+					infoList.add(startAt);
+					infoList.add(endAt);
+					infoList.add(update);
+				}
 
 				//参加者メールリスト
 				List<String> attendEmailList = new ArrayList<String>();
