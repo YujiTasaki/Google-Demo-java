@@ -11,6 +11,22 @@
     <servlet-name>MainServlet</servlet-name>
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>User Basic Auth</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>User Basic Auth</realm-name>
+  </login-config>
+  <security-role>
+    <role-name>admin</role-name>
+  </security-role>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.htm</welcome-file>
