@@ -167,14 +167,22 @@ public class MngLockApi {
 	 */
 	private String refreshAccessToken(){
 		try {
+			logger.error("Lockアクセストークン要求開始");
 			lock.lock();
+			logger.error("1行目処理完了");
 			isRefresh = true;
+			logger.error("2行目処理完了");
 			LockResOAuthInfo oAuthInfo = LockApiUtil.refreshOAuthToken(this.refreshToken);
+			logger.error("3行目処理完了");
 			this.accessToken = oAuthInfo.getAccess_token();
+			logger.error("4行目処理完了");
 			this.refreshToken = oAuthInfo.getRefresh_token();
+			logger.error("5行目処理完了");
 			logger.info(String.format("refresh accessToken:%s refreshToken:%s", this.accessToken, this.refreshToken));
 			this.updateToken = Calendar.getInstance().getTimeInMillis();
+			logger.error("6行目処理完了");
 			condition.signalAll();// Signalを送ることで対応するConditionでawaitしていた処理が再開する。
+			logger.error("7行目処理完了");
 		} catch (Exception e) {
 			logger.error("can't refresh AccessToken",e);
 			this.accessToken = null;
@@ -183,6 +191,7 @@ public class MngLockApi {
 		} finally{
 			isRefresh = false;
 			lock.unlock();
+			logger.error("Lockアクセストークン要求終了");
 		}
 		return this.accessToken;
 	}
