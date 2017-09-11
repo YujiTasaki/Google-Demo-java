@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.mail.MessagingException;
 
@@ -41,6 +43,7 @@ public class MngDbLockParam {
 	 * SQLite用データベースアクセス管理クラス
 	 */
 	private MngDBAccees mngDBAccees;
+
 
 	/**
 	 * コンストラクタ
@@ -189,7 +192,7 @@ public class MngDbLockParam {
 			connection = this.mngDBAccees.getConnection();
 
 			//reqID取得
-			long id = loadSampleMaxID(connection) + 1;
+			long id = loadSampleMaxID(connection, "T_SAMPLE") + 1;
 
 			StringBuilder query = new StringBuilder();
 			query.append("INSERT INTO T_SAMPLE(");
@@ -228,19 +231,183 @@ public class MngDbLockParam {
 	    }
 	}
 
+
+
+	/**
+	 * T_EVENT_USERテーブルにデータ設定
+	 * @param event_id
+	 * @param user_id
+	 * @throws SQLException
+	 */
+	public void insertEventUser(String event_id, String user_id) throws SQLException{
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			connection = this.mngDBAccees.getConnection();
+
+			//reqID取得
+			long id = loadSampleMaxID(connection, "T_EVENT_USER") + 1;
+
+			StringBuilder query = new StringBuilder();
+			query.append("INSERT INTO T_EVENT_USER(");
+			query.append("id,");
+			query.append("event_id,");
+			query.append("user_id,");
+			query.append("delete_flg");
+			query.append(") VALUES (");
+			query.append('?').append(',');
+			query.append('?').append(',');
+			query.append('?').append(',');
+			query.append('0').append(')');
+			query.append(';');
+			preparedStatement = connection.prepareStatement(query.toString());
+			// 自動コミット:OFF
+			connection.setAutoCommit(false);
+			int index = 1;
+			preparedStatement.setLong(index++, id);
+			preparedStatement.setString(index++, event_id);
+			preparedStatement.setString(index++, user_id);
+			//logger.info(query.toString());
+			preparedStatement.executeUpdate();
+			// 手動コミット ＆ 自動コミット:ON
+			connection.commit();
+			connection.setAutoCommit(true);
+
+		}catch(Exception e){
+			logger.error("# Failed in inserting the data(s) to database.", e);
+			try {
+				if(connection != null){
+					connection.rollback();
+				}
+			} catch(Exception e1) {
+			}
+			throw e;
+		}finally{
+			// DB切断
+			mngDBAccees.close(connection, preparedStatement);
+	    }
+	}
+
+	/**
+	 * T_EVENT_USERテーブルからデータ取得
+	 * @param eventId
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<String> getEventUser(String eventId) throws SQLException{
+		List<String> res = null;
+		Connection connection = null;
+		try {
+			connection = this.mngDBAccees.getConnection();
+			res = getEventUser(connection, eventId);
+	    }finally{
+			mngDBAccees.close(connection);
+	    }
+		return res;
+	}
+
+
+	/**
+	 * T_EVENT_USERテーブルからデータ取得(コネクション継続)
+	 * @param connection
+	 * @param eventId
+	 * @return
+	 * @throws SQLException
+	 */
+	private List<String> getEventUser(Connection connection, String eventId) throws SQLException{
+		String res = null;
+		List<String> list = new ArrayList<String>();
+		PreparedStatement preparedStatement = null;
+		ResultSet rs = null;
+		try {
+			String query = "SELECT * FROM T_EVENT_USER WHERE EVENT_ID = ? AND DELETE_FLG = 0;";
+			preparedStatement = connection.prepareStatement(query);
+			int index = 1;
+			preparedStatement.setString(index++, eventId);
+			rs = preparedStatement.executeQuery();
+			// データ格納
+			//if(rs.next()) {
+			//	res = rs.getString("user_id");
+			//}
+			while(rs.next()){
+			    list.add(rs.getString("user_id"));
+			}
+		}
+		catch(Exception e) {
+			System.out.println(e);
+	    }finally{
+			//Statement,ResultSetのみクローズ
+	    	mngDBAccees.close(null,preparedStatement, rs);
+	    }
+		//return res;
+		return list;
+	}
+
+
+	/**
+	 * T_EVENT_USERテーブルのデータ更新
+	 * @param user_id
+	 * @throws SQLException
+	 */
+	public void updateEventUser(String user_id) throws SQLException{
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			connection = this.mngDBAccees.getConnection();
+
+			//reqID取得
+			//long id = loadSampleMaxID(connection, "T_EVENT_USER") + 1;
+
+			StringBuilder query = new StringBuilder();
+			query.append("UPDATE T_EVENT_USER ");
+			query.append("SET DELETE_FLG ");
+			query.append("= ");
+			query.append("'1' ");
+			query.append("WHERE USER_ID ");
+			query.append("= ");
+			query.append("?");
+			query.append(";");
+			preparedStatement = connection.prepareStatement(query.toString());
+			// 自動コミット:OFF
+			connection.setAutoCommit(false);
+			int index = 1;
+			preparedStatement.setString(index++, user_id);
+
+			//logger.info(query.toString());
+			preparedStatement.executeUpdate();
+			// 手動コミット ＆ 自動コミット:ON
+			connection.commit();
+			connection.setAutoCommit(true);
+
+		}catch(Exception e){
+			logger.error("# Failed in inserting the data(s) to database.", e);
+			try {
+				if(connection != null){
+					connection.rollback();
+				}
+			} catch(Exception e1) {
+			}
+			throw e;
+		}finally{
+			// DB切断
+			mngDBAccees.close(connection, preparedStatement);
+	    }
+	}
+
+
 	/**
 	 * ID最大値取得
 	 * @param statement
 	 * @return
 	 * @throws SQLException
 	 */
-	private long loadSampleMaxID(Connection connection) throws SQLException {
+	private long loadSampleMaxID(Connection connection, String dbname) throws SQLException {
 		long res = 0;
 		Statement statement = null;
 		ResultSet rs = null;
 		try {
 			statement = connection.createStatement();
-			String query = "SELECT MAX(id) as max_id FROM T_SAMPLE;";
+			String query = "SELECT MAX(id) as max_id FROM " + dbname + ";";
 			rs = statement.executeQuery(query);
 			// データ格納
 			if(rs.next()) {
@@ -253,24 +420,51 @@ public class MngDbLockParam {
 		return res;
 	}
 
+
+	/**
+	 * 練習用
+	 * @param args
+	 * @throws MessagingException
+	 * @throws IOException
+	 * @throws MsgException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public static void main(String[] args) throws MessagingException, IOException, MsgException, ClassNotFoundException, SQLException {
 		//String realPath = "D:\\Data\\ProgramData\\Eclipse\\workspaces\\Lock\\LockStateCalendar\\LockstateDemo\\WebContent";
-		String realPath = "C:\\workspace\\LockstateDemo\\WebContent";
-		MngDbLockParam mngDbLockParam = new MngDbLockParam(realPath);
-		mngDbLockParam.insertSample("test1", Calendar.getInstance());
-		mngDbLockParam.insertSample("test2", Calendar.getInstance());
-		mngDbLockParam.insertSample("test3", Calendar.getInstance());
-		mngDbLockParam.insertSample("test4", Calendar.getInstance());
 
-		String key = "key1";
-		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
-		String val = "val1";
-		mngDbLockParam.setParam(key, val);
-		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
-		mngDbLockParam.setParam(key, null);
-		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
-		mngDbLockParam.setParam(key, val);
-		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
-		mngDbLockParam.close();
+		//DBにイベントIDとユーザーIDを登録
+		String REAL_PATH        = SysParamUtil.getResourceString("DIR_PATH");
+		MngDbLockParam mngDbLockParam = new MngDbLockParam(REAL_PATH);
+		mngDbLockParam.insertEventUser("1", "2");
+
+		//DB検索
+		//String res = mngDbLockParam.getParam("key1");
+		List<String> res2 = mngDbLockParam.getEventUser("1");
+		System.out.println(res2);
+
+		mngDbLockParam.updateEventUser("2");
+
+		List<String> res3 = mngDbLockParam.getEventUser("1");
+		System.out.println(res3);
+
+
+//		String realPath = "C:\\workspace\\LockstateDemo\\WebContent";
+//		MngDbLockParam mngDbLockParam = new MngDbLockParam(realPath);
+//		mngDbLockParam.insertSample("test1", Calendar.getInstance());
+//		mngDbLockParam.insertSample("test2", Calendar.getInstance());
+//		mngDbLockParam.insertSample("test3", Calendar.getInstance());
+//		mngDbLockParam.insertSample("test4", Calendar.getInstance());
+//
+//		String key = "key1";
+//		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
+//		String val = "val1";
+//		mngDbLockParam.setParam(key, val);
+//		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
+//		mngDbLockParam.setParam(key, null);
+//		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
+//		mngDbLockParam.setParam(key, val);
+//		System.out.println(key + ":" + mngDbLockParam.getParam("key1"));
+//		mngDbLockParam.close();
 	}
 }

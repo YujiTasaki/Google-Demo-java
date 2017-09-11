@@ -1,6 +1,7 @@
 package jp.co.kke.Lockstatedemo.mng;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -46,6 +47,24 @@ public class MngSchedule {
 
 
 	private String updateMin = null;
+
+
+	/**
+	 * ディレクトリパス
+	 */
+	private static final String REAL_PATH        = SysParamUtil.getResourceString("DIR_PATH");
+
+	/**
+	 * カレンダーイベント追加・変更時のステータス
+	 */
+	private static final String EVENT_CONFIRMED  = "confirmed";
+
+	/**
+	 * カレンダーイベント削除時のステータス
+	 */
+	private static final String EVENT_CANCELED  = "cancelled";
+
+
 
 	/**
 	 * コンストラクタ
@@ -121,6 +140,7 @@ public class MngSchedule {
 			OffsetDateTime updateMinDateTime = OffsetDateTime.now();  //現在時刻
 			updateMin = updateMinDateTime.format(DateTimeFormatter.ISO_INSTANT);
 		}
+
 		String calendarId = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID");
 		GoogleResCalendarEventsListInfo res = getMngGoogleApi().getCalendarEventList(calendarId, updateMin);
 
@@ -131,94 +151,167 @@ public class MngSchedule {
 		}
 		logger.info(eventMap);
 
-		doConnectApi(mngLockApi, eventMap);
+		doConnectApi(eventMap);
 
 		logger.info("最終更新時間");
 		logger.info(updateMin);
-
 		logger.info("doCheck:end");
 	}
 
 
 	/**
-	 * ConnectApi処理の実行
+	 * イベント毎に処理を実行
 	 * @param mngLockApi
 	 * @param eventMap
 	 * @throws Exception
 	 * @throws MsgException
 	 */
-	private void doConnectApi(MngLockApi mngLockApi, Map<String, List<List<String>>> eventMap)
+	private void doConnectApi(Map<String, List<List<String>>> eventMap)
 			throws Exception, MsgException {
-		//API実行
+
+		MngDbLockParam mngDbLockParam = new MngDbLockParam(REAL_PATH);
+		//イベントごとに処理を実行
 		for(String key: eventMap.keySet())
 		{
 			List<List<String>> value = eventMap.get(key);
+			String eventId = key;
 			List<String> datas = value.get(0);
 			List<String> attendees = value.get(1);
 			String status = datas.get(0);
 			String startAt = datas.get(1);
 			String endAt = datas.get(2);
 			String update = datas.get(3);
+			//String eventId = datas.get(4);
 			updateMin = update;
 
-			for(int i=0; i<attendees.size(); i++) {
+			//T_EVENT_USER.eventIdをキーにしてT_EVENT_USERからuserIdを検索
+			List<String> userList = mngDbLockParam.getEventUser(eventId);
 
-				//アクセスゲストの作成
-				String email = attendees.get(i);
-				String name = email;
-				LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
-				info.setType("access_guest");
-				info.getAttributes().put("name", name);
-				info.getAttributes().put("email", email);
-				info.getAttributes().put("starts_at", startAt);
-				info.getAttributes().put("ends_at", endAt);
+			//予約の新規作成（変更でない）の場合
+			if(status.equals(EVENT_CONFIRMED) && userList.size() == 0)
+			{
+				//アクセスゲスト作成とメール送信
+				createAccessGuest(attendees, startAt, endAt, eventId);
+			}
+			//予約の変更の場合
+			else if(status.equals(EVENT_CONFIRMED) && userList.size() != 0)
+			{
+				//アクセスゲストの削除
+				deleteAccessGuest(userList);
+				//アクセスゲスト作成とメール送信
+				createAccessGuest(attendees, startAt, endAt, eventId);
+			}
+			//予約の削除の場合
+			else if(status.equals(EVENT_CANCELED))
+			{
+				//アクセスゲストの削除
+				deleteAccessGuest(userList);
+			}
+		}
+	}
 
-				LockResAccessPersonsInfo resUser=null;
-				for (int j = 0; j < 5; j++) {
-					try {
-						String pinCode = "";
-						for (int r = 0; r < 8; r++) {
-							Random rnd = new Random();
-							pinCode = pinCode + String.valueOf(rnd.nextInt(10));
-						}
-						info.getAttributes().put("pin", pinCode);
-						logger.info("PINコード" + pinCode);
-						resUser = mngLockApi.createUsers(info);
 
-					} catch (Exception e) {
-						logger.error(e);
+	/**
+	 * アクセスゲスト作成・デバイス紐付け・メール送信
+	 * @param mngLockApi
+	 * @param attendees
+	 * @param startAt
+	 * @param endAt
+	 * @param eventId
+	 * @throws MsgException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private void createAccessGuest(List<String> attendees, String startAt, String endAt,
+			String eventId) throws MsgException, ClassNotFoundException, SQLException, Exception {
+
+		MngLockApi mngLockApi = getMngLockApi();
+
+		for(int i=0; i<attendees.size(); i++) {
+
+			//アクセスゲストの作成
+			String email = attendees.get(i);
+			String name = email;
+			LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
+			info.setType("access_guest");
+			info.getAttributes().put("name", name);
+			info.getAttributes().put("email", email);
+			info.getAttributes().put("starts_at", startAt);
+			info.getAttributes().put("ends_at", endAt);
+
+			LockResAccessPersonsInfo resUser=null;
+			for (int j = 0; j < 5; j++) {
+				try {
+					String pinCode = "";
+					for (int r = 0; r < 8; r++) {
+						Random rnd = new Random();
+						pinCode = pinCode + String.valueOf(rnd.nextInt(10));
 					}
-					if(resUser!=null) {
-						break;
-					}
-				}
+					info.getAttributes().put("pin", pinCode);
+					logger.info("PINコード" + pinCode);
+					resUser = mngLockApi.createUsers(info);
 
-				if(resUser==null) {
-					//システム管理者にメールする？
-					throw new MsgException("アクセスゲスト作成に5回以上失敗しました。不要なPINコードを削除してください。もしくは入力データが間違っている可能性がございます。");
+				} catch (Exception e) {
+					logger.error(e);
 				}
-
-				String userId = resUser.getData().getId();
-				logger.info(userId);
-
-				//デバイスとの紐付け
-				//String deviceId = "7888de18-1e1f-412e-8e26-75da5968cc7b";
-				String deviceId = mngLockApi.getDeviceId();
-				if(deviceId == null)
-				{
-					throw new MsgException("デバイス未設定");
-				}
-				else
-				{
-					LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
-					access.getAttributes().put("accessible_id", deviceId);
-					access.getAttributes().put("accessible_type", "lock");
-					String resAccess = mngLockApi.setDeviceUsers(access, userId);
-					logger.info(resAccess);
-					//メール送信
-					String resEmail = mngLockApi.sendEmail(userId);
+				if(resUser!=null) {
+					break;
 				}
 			}
+
+			if(resUser==null) {
+				//システム管理者にメールする？
+				throw new MsgException("アクセスゲスト作成に5回以上失敗しました。不要なPINコードを削除してください。もしくは入力データが間違っている可能性がございます。");
+			}
+
+			String userId = resUser.getData().getId();
+
+			//DBにイベントIDとユーザーIDを登録
+			//String REAL_PATH        = SysParamUtil.getResourceString("DIR_PATH");
+			MngDbLockParam mngDbLockParam = new MngDbLockParam(REAL_PATH);
+			mngDbLockParam.insertEventUser(eventId, userId);
+
+			logger.info(userId);
+
+			//デバイスとの紐付け
+			//String deviceId = "7888de18-1e1f-412e-8e26-75da5968cc7b";
+			String deviceId = mngLockApi.getDeviceId();
+			if(deviceId == null)
+			{
+				throw new MsgException("デバイス未設定");
+			}
+			else
+			{
+				LockReqAccessPersonsAccess access = new LockReqAccessPersonsAccess();
+				access.getAttributes().put("accessible_id", deviceId);
+				access.getAttributes().put("accessible_type", "lock");
+				String resAccess = mngLockApi.setDeviceUsers(access, userId);
+				logger.info(resAccess);
+				//メール送信
+				String resEmail = mngLockApi.sendEmail(userId);
+			}
+		}
+	}
+
+
+	/**
+	 * アクセスゲストの削除
+	 * @param userList
+	 * @throws Exception
+	 */
+	private void deleteAccessGuest(List<String> userList) throws Exception
+	{
+		MngLockApi mngLockApi = getMngLockApi();
+		for (int i=0; i<userList.size(); i++)
+		{
+			String userId = userList.get(i);
+			//アクセスゲストの削除
+			String res = mngLockApi.deleteUsers(userId);
+			//T_EVENT_USER.delete_flgをTRUEにセット
+			String REAL_PATH        = SysParamUtil.getResourceString("DIR_PATH");
+			MngDbLockParam mngDbLockParam = new MngDbLockParam(REAL_PATH);
+			mngDbLockParam.updateEventUser(userId);
 		}
 	}
 
@@ -244,7 +337,7 @@ public class MngSchedule {
 			List<String> infoList = new ArrayList<String>();
 			String status = items.getStatus();
 
-			if(status.equals("confirmed"))
+			if(status.equals(EVENT_CONFIRMED))
 			{
 				String update = items.getUpdated();
 
@@ -287,6 +380,7 @@ public class MngSchedule {
 					infoList.add(startAtMinusStr);
 					infoList.add(endAtPlusStr);
 					infoList.add(update);
+					infoList.add(eventId);
 				}
 				else
 				{
@@ -294,6 +388,7 @@ public class MngSchedule {
 					infoList.add(startAt);
 					infoList.add(endAt);
 					infoList.add(update);
+					infoList.add(eventId);
 				}
 
 				//参加者メールリスト
@@ -317,7 +412,17 @@ public class MngSchedule {
 				List<List<String>> valueList = new ArrayList<List<String>>();
 				valueList.add(infoList);
 				valueList.add(attendEmailList);
-
+				eventMap.put(eventId,valueList);
+			}
+			else if(status.equals(EVENT_CANCELED))
+			{
+				infoList.add(status);
+				infoList.add(null);
+				infoList.add(null);
+				infoList.add(null);
+				List<List<String>> valueList = new ArrayList<List<String>>();
+				valueList.add(infoList);
+				valueList.add(null);
 				eventMap.put(eventId,valueList);
 			}
 		}

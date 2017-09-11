@@ -341,5 +341,30 @@ public class MngLockApi {
 	}
 
 
+	/**
+	 * アクセスゲストの削除
+	 * @param info
+	 * @return 返信データ(json形式)
+	 * @throws Exception
+	 */
+	public String deleteUsers(String userId) throws Exception{
+		String res = null;
+		if(isOkAccessToken() == false){
+			throw new MsgException("未認証");
+		}
+
+		lock.lock();
+		try{
+			while(this.isRefresh){
+				condition.await();
+			}
+			res = LockApiUtil.deleteUsersJson(this.accessToken, userId);
+		} finally{
+			lock.unlock();
+		}
+		return res;
+	}
+
+
 
 }

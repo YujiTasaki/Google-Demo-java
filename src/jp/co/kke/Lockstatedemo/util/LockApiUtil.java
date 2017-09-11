@@ -145,6 +145,25 @@ public class LockApiUtil {
 		return res.toString();
 	}
 
+
+	/**
+	 * アクセスゲストの削除用URL
+	 * @param userId
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private static String deleteUsersUrl(String userId) throws UnsupportedEncodingException {
+		userId = URLEncoder.encode(userId, S_CHARSET);
+		StringBuilder res = new StringBuilder();
+		res.append(S_API_ENDPOINT);
+		res.append("/access_persons/");
+		res.append(userId);
+		return res.toString();
+	}
+
+
+
+
     /**
      * アクセストークン更新用パラメータ生成
      * @param refresh_token
@@ -308,6 +327,21 @@ public class LockApiUtil {
 		String url = sendEmailUrl(userId);
 		return doApiRequest(url, "POST", access_token, null);
 	}
+
+
+	/**
+	 * アクセスゲストの削除(Json形式)(返信オブジェクト形式は、不要)
+	 * @param access_token
+	 * @param access
+	 * @return 返信データ(Json形式)
+	 * @throws IOException
+	 * @throws MsgException
+	 */
+	public static String deleteUsersJson(String access_token, String userId) throws IOException, MsgException {
+		String url = deleteUsersUrl(userId);
+		return doApiRequest(url, "DELETE", access_token, null);
+	}
+
 
 	/**
 	 * デバイスの鍵の開閉(Json形式)
