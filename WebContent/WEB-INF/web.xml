@@ -11,7 +11,6 @@
     <servlet-name>MainServlet</servlet-name>
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
-  <!--
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>User Basic Auth</web-resource-name>
@@ -28,7 +27,6 @@
   <security-role>
     <role-name>admin</role-name>
   </security-role>
-  -->
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.htm</welcome-file>
