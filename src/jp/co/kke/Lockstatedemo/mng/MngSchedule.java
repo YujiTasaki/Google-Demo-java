@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,6 +62,11 @@ public class MngSchedule {
 	 * カレンダーイベント削除時のステータス
 	 */
 	private static final String EVENT_CANCELED  = "cancelled";
+
+	/**
+	 * カレンダーイベント非表示時のステータス
+	 */
+	private static final String EVENT_PRIVATE  = "private";
 
 
 
@@ -142,13 +146,21 @@ public class MngSchedule {
 		}
 
 		String calendarId = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID");
+		//String calendarId2 = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID2");
 		GoogleResCalendarEventsListInfo res = getMngGoogleApi().getCalendarEventList(calendarId, updateMin);
+		//GoogleResCalendarEventsListInfo res2 = getMngGoogleApi().getCalendarEventList(calendarId2, updateMin);
 
 		Map<String, List<List<String>>> eventMap = new HashMap<String, List<List<String>>>();
+		//Map<String, List<List<String>>> eventMap2 = new HashMap<String, List<List<String>>>();
 		if(res != null)
 		{
 			eventMap = createEventList(calendarId, res);
 		}
+		//if(res2 != null)
+		//{
+		//	eventMap2 = createEventList(calendarId, res2);
+		//}
+
 		logger.info(eventMap);
 
 		doConnectApi(eventMap);
@@ -240,30 +252,38 @@ public class MngSchedule {
 			info.getAttributes().put("starts_at", startAt);
 			info.getAttributes().put("ends_at", endAt);
 
+			//PINコードの自動生成機能が追加されたため、追加 (2017/9/22)
+			info.getAttributes().put("generate_pin", "true");
+
 			LockResAccessPersonsInfo resUser=null;
-			for (int j = 0; j < 5; j++) {
-				try {
-					String pinCode = "";
-					for (int r = 0; r < 8; r++) {
-						Random rnd = new Random();
-						pinCode = pinCode + String.valueOf(rnd.nextInt(10));
-					}
-					info.getAttributes().put("pin", pinCode);
-					logger.info("PINコード" + pinCode);
-					resUser = mngLockApi.createUsers(info);
+			//PINコードの自動生成機能が追加されたため、追加 (2017/9/22)
+			resUser = mngLockApi.createUsers(info);
 
-				} catch (Exception e) {
-					logger.error(e);
-				}
-				if(resUser!=null) {
-					break;
-				}
-			}
+			//PINコードの自動生成機能が追加されたため、削除 (2017/9/22)
+//			for (int j = 0; j < 10; j++) {
+//				try {
+//					String pinCode = "";
+//					for (int r = 0; r < 5; r++) {
+//						Random rnd = new Random();
+//						pinCode = pinCode + String.valueOf(rnd.nextInt(10));
+//					}
+//					info.getAttributes().put("pin", pinCode);
+//					logger.info("PINコード" + pinCode);
+//					resUser = mngLockApi.createUsers(info);
+//
+//				} catch (Exception e) {
+//					logger.error(e);
+//				}
+//				if(resUser!=null) {
+//					break;
+//				}
+//			}
+//
+//			if(resUser==null) {
+//				//システム管理者にメールする？
+//				throw new MsgException("アクセスゲスト作成に10回以上失敗しました。不要なPINコードを削除してください。もしくは入力データが間違っている可能性がございます。");
+//			}
 
-			if(resUser==null) {
-				//システム管理者にメールする？
-				throw new MsgException("アクセスゲスト作成に5回以上失敗しました。不要なPINコードを削除してください。もしくは入力データが間違っている可能性がございます。");
-			}
 
 			String userId = resUser.getData().getId();
 
@@ -336,6 +356,14 @@ public class MngSchedule {
 			//イベント情報
 			List<String> infoList = new ArrayList<String>();
 			String status = items.getStatus();
+			String visibility = items.getVisibility();
+
+			//非表示イベントは情報が取れないため、処理しない
+			if(visibility != null)
+			{
+				logger.info("非表示イベント 処理しない " + eventId);
+				continue;
+			}
 
 			if(status.equals(EVENT_CONFIRMED))
 			{
