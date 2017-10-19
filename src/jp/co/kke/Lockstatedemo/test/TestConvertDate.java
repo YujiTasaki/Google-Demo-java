@@ -4,9 +4,14 @@ import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
+import jp.co.kke.Lockstatedemo.util.SysParamUtil;
+
 public class TestConvertDate {
 
 	public static void main(String[] args) throws ParseException {
+
+
+		String[] denialRakumoUsers = SysParamUtil.getResourceString("DENIAL_RAKUMO_USER").split(",");
 
 		//開始時刻
 		String startAt = "2017-08-18T10:15:00+09:00";

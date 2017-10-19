@@ -147,23 +147,26 @@ public class MngSchedule {
 
 		String calendarId = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID");
 		//String calendarId2 = SysParamUtil.getResourceString("GOOGLE_CHECK_CALENDAR_ID2");
+
 		GoogleResCalendarEventsListInfo res = getMngGoogleApi().getCalendarEventList(calendarId, updateMin);
 		//GoogleResCalendarEventsListInfo res2 = getMngGoogleApi().getCalendarEventList(calendarId2, updateMin);
 
 		Map<String, List<List<String>>> eventMap = new HashMap<String, List<List<String>>>();
 		//Map<String, List<List<String>>> eventMap2 = new HashMap<String, List<List<String>>>();
+
 		if(res != null)
 		{
 			eventMap = createEventList(calendarId, res);
 		}
 		//if(res2 != null)
 		//{
-		//	eventMap2 = createEventList(calendarId, res2);
+		//	eventMap2 = createEventList(calendarId2, res2);
 		//}
 
 		logger.info(eventMap);
 
 		doConnectApi(eventMap);
+		//doConnectApi(eventMap2);
 
 		logger.info("最終更新時間");
 		logger.info(updateMin);
@@ -244,6 +247,43 @@ public class MngSchedule {
 
 			//アクセスゲストの作成
 			String email = attendees.get(i);
+
+
+//			//同意拒否ユーザーを除く場合
+//			String[] denialRakumoUsers = SysParamUtil.getResourceString("DENIAL_RAKUMO_USER").split(",");
+//			//同意拒否の場合は、処理しない
+//			boolean denialFlg = false;
+//			for(int k=0; k<denialRakumoUsers.length; k++) {
+//				String denialUser = denialRakumoUsers[k];
+//				if(email.equals(denialUser))
+//				{
+//					denialFlg = true;
+//					break;
+//				}
+//			}
+//			if(denialFlg)
+//			{
+//				logger.info("rakumo登録されましたが、ご同意頂けなかったため、アクセスゲスト作成処理を行いませんでした");
+//				continue;
+//			}
+
+			//同意ユーザーのみ処理を行う場合
+			String[] rakumoUsers = SysParamUtil.getResourceString("RAKUMO_USER").split(",");
+			boolean consentFlg = false;
+			for(int k=0; k<rakumoUsers.length; k++) {
+				String denialUser = rakumoUsers[k];
+				if(email.equals(denialUser))
+				{
+					consentFlg = true;
+					break;
+				}
+			}
+			if(!consentFlg)
+			{
+				logger.info("rakumo登録されましたが、同意ユーザーではないため、アクセスゲスト作成処理を行いませんでした");
+				continue;
+			}
+
 			String name = email;
 			LockReqAccessPersonsInfo info = new LockReqAccessPersonsInfo();
 			info.setType("access_guest");
@@ -311,6 +351,15 @@ public class MngSchedule {
 				//メール送信
 				String resEmail = mngLockApi.sendEmail(userId);
 			}
+
+
+			//ここに、登録されたカレンダーによる場合分けが必要
+
+
+
+
+
+
 		}
 	}
 
