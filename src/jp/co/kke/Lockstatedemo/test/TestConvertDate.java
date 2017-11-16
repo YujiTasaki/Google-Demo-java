@@ -11,6 +11,8 @@ public class TestConvertDate {
 	public static void main(String[] args) throws ParseException {
 
 
+		//test
+
 		String[] denialRakumoUsers = SysParamUtil.getResourceString("DENIAL_RAKUMO_USER").split(",");
 
 		//開始時刻
