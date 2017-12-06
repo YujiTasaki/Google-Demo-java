@@ -86,8 +86,15 @@ public class LockApiUtil {
 	 * リダイレクトで使用
 	 * @return
 	 */
+    /* 動いたら削除予定
 	public static String getAuthorizationCodeUrl() {
 		Map<String, String> paramMap = getAuthorizationCodeParamMap();
+		String param = getParam(paramMap);
+		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
+	}
+	*/
+    public static String getAuthorizationCodeUrl(String s_CID, String s_URL) {
+		Map<String, String> paramMap = getAuthorizationCodeParamMap(s_CID, s_URL);
 		String param = getParam(paramMap);
 		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
 	}
@@ -197,11 +204,20 @@ public class LockApiUtil {
 	 * AuthorizationCode生成用パラメータ生成
 	 * @return
 	 */
+	/*
 	private static Map<String, String> getAuthorizationCodeParamMap(){
 		Map<String, String> res = new HashMap<String, String>();
 		res.put("client_id", S_CLIENT_ID);
 		res.put("response_type", "code");
 		res.put("redirect_uri", S_REDIRECT_URI);
+		return res;
+	}
+	*/
+	private static Map<String, String> getAuthorizationCodeParamMap(String s_CID, String s_URL){
+		Map<String, String> res = new HashMap<String, String>();
+		res.put("client_id", s_CID);
+		res.put("response_type", "code");
+		res.put("redirect_uri", s_URL);
 		return res;
 	}
 

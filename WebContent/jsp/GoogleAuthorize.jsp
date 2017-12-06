@@ -4,11 +4,23 @@
 <%@ page import="java.net.*"%>
 <%@ page import="java.lang.*"%>
 <%@ page import="jp.co.kke.Lockstatedemo.util.*"%>
-<%
+<%--
 	String codeurl = GoogleApiUtil.getAuthorizationCodeUrl();
     response.sendRedirect(codeurl);
-%>
+--%>
 
+<%
+    String s_CID = request.getParameter("ClientID");
+    String s_SID = request.getParameter("SecletID");
+    String s_URL = request.getParameter("redirectURL");
+
+    System.out.println(s_CID);
+    System.out.println(s_SID);
+    System.out.println(s_URL);
+
+    String codeurl = GoogleApiUtil.getAuthorizationCodeUrl(s_CID, s_URL);
+    response.sendRedirect(codeurl);
+%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

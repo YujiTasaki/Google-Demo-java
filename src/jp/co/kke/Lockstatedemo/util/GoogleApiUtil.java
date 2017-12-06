@@ -99,11 +99,24 @@ public class GoogleApiUtil {
 	 * リダイレクトで使用
 	 * @return
 	 */
+	/*
 	public static String getAuthorizationCodeUrl() {
 		Map<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("response_type", "code");
 		paramMap.put("client_id", S_CLIENT_ID);
 		paramMap.put("redirect_uri", S_REDIRECT_URI);
+		paramMap.put("scope", S_API_SCOPES);
+		paramMap.put("access_type", "offline");
+		paramMap.put("prompt", "consent");
+		String param = convParam(paramMap);
+		return S_OAUTH_ENDPOINT + "/o/oauth2/v2/auth?" + param;
+	}
+	*/
+	public static String getAuthorizationCodeUrl(String s_CID, String s_URL) {
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("response_type", "code");
+		paramMap.put("client_id", s_CID);
+		paramMap.put("redirect_uri", s_URL);
 		paramMap.put("scope", S_API_SCOPES);
 		paramMap.put("access_type", "offline");
 		paramMap.put("prompt", "consent");
