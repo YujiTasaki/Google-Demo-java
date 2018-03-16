@@ -93,8 +93,8 @@ public class LockApiUtil {
 		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
 	}
 	*/
-    public static String getAuthorizationCodeUrl(String s_CID, String s_URL) {
-		Map<String, String> paramMap = getAuthorizationCodeParamMap(s_CID, s_URL);
+    public static String getAuthorizationCodeUrl(String s_CID) {
+		Map<String, String> paramMap = getAuthorizationCodeParamMap(s_CID);
 		String param = getParam(paramMap);
 		return S_OAUTH_ENDPOINT + "/oauth/authorize?" + param;
 	}
@@ -169,8 +169,6 @@ public class LockApiUtil {
 	}
 
 
-
-
     /**
      * アクセストークン更新用パラメータ生成
      * @param refresh_token
@@ -213,11 +211,11 @@ public class LockApiUtil {
 		return res;
 	}
 	*/
-	private static Map<String, String> getAuthorizationCodeParamMap(String s_CID, String s_URL){
+	private static Map<String, String> getAuthorizationCodeParamMap(String s_CID){
 		Map<String, String> res = new HashMap<String, String>();
 		res.put("client_id", s_CID);
 		res.put("response_type", "code");
-		res.put("redirect_uri", s_URL);
+		res.put("redirect_uri", S_REDIRECT_URI);
 		return res;
 	}
 
@@ -357,7 +355,6 @@ public class LockApiUtil {
 		String url = deleteUsersUrl(userId);
 		return doApiRequest(url, "DELETE", access_token, null);
 	}
-
 
 	/**
 	 * デバイスの鍵の開閉(Json形式)

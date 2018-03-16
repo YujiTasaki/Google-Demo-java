@@ -22,7 +22,7 @@ public class GetCalendarList  extends AbstractMngMessage{
 
 		//pullされたら、チェック処理をを呼び出す（今は、pullを仕掛けていない）
 		//getCalendarリストボタンを押したときの処理
-		this.getServlet().getMngSchedule().doCheck();
+		//this.getServlet().getMngSchedule().doCheck();
 
 //		//resの中から必要な値を取ってくる
 //		for(int i=0; i<res.getItems().size(); i++) {

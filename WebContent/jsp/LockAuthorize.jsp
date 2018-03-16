@@ -11,14 +11,10 @@
 
 <%
     String s_CID = request.getParameter("ClientID");
-    String s_SID = request.getParameter("SecletID");
-    String s_URL = request.getParameter("redirectURL");
 
     System.out.println(s_CID);
-    System.out.println(s_SID);
-    System.out.println(s_URL);
 
-    String codeurl = LockApiUtil.getAuthorizationCodeUrl(s_CID, s_URL);
+    String codeurl = LockApiUtil.getAuthorizationCodeUrl(s_CID);
     response.sendRedirect(codeurl);
 %>
 

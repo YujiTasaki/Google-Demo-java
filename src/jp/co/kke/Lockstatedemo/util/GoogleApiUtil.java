@@ -112,11 +112,11 @@ public class GoogleApiUtil {
 		return S_OAUTH_ENDPOINT + "/o/oauth2/v2/auth?" + param;
 	}
 	*/
-	public static String getAuthorizationCodeUrl(String s_CID, String s_URL) {
+	public static String getAuthorizationCodeUrl(String s_CID) {
 		Map<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("response_type", "code");
 		paramMap.put("client_id", s_CID);
-		paramMap.put("redirect_uri", s_URL);
+		paramMap.put("redirect_uri", S_REDIRECT_URI);
 		paramMap.put("scope", S_API_SCOPES);
 		paramMap.put("access_type", "offline");
 		paramMap.put("prompt", "consent");
@@ -338,7 +338,7 @@ public class GoogleApiUtil {
 	public static GoogleResCalendarEventsListInfo getCalendarEventList(String calendarId, String updateMin, String access_token) throws MessagingException, IOException, MsgException{
 		ObjectMapper mapper = new ObjectMapper();
 		String json = getCalendarEventListJson(calendarId, updateMin, access_token);
-		logger.info("getCalendarEventList:"+json);
+		//logger.info("getCalendarEventList:"+json);
 		return mapper.readValue(json, GoogleResCalendarEventsListInfo.class);
 	}
 	/**
